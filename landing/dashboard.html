@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — ConcorsoAI</title>
-  <meta name="description" content="Dashboard ConcorsoAI: carica il tuo bando e preparati all'orale del concorso pubblico." />
-  <meta name="theme-color" content="#F7FBFF" />
+  <meta name="description" content="Dashboard ConcorsoAI: avvia simulazioni, monitora i progressi e carica i bandi del tuo concorso." />
+  <meta name="theme-color" content="#0A0A0F" />
 
   <!-- Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,7 +18,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          fontFamily: { sans: ['Inter','ui-sans-serif', 'system-ui','sans-serif'] },
           colors: {
             brand: {
               50: '#F7FBFF',
@@ -31,12 +31,22 @@
               700: '#0B3A63',
               800: '#0B2A4A',
               900: '#071D33'
+            },
+            dark: {
+              bg: '#0A0A0F',
+              surface: '#12121A',
+              surface2: '#1A1A26',
+            },
+            accent: {
+              purple: '#6C5CE7',
+              cyan: '#00D2FF',
             }
           },
           boxShadow: {
             card: '0 24px 70px rgba(15,76,129,.12)',
             cardHover: '0 30px 90px rgba(15,76,129,.18)',
-            glowBlue: '0 18px 45px rgba(37,99,235,.22)'
+            glow: '0 0 40px rgba(108,92,231,0.35)',
+            glowHover: '0 0 70px rgba(108,92,231,0.6)',
           }
         }
       }
@@ -48,26 +58,32 @@
 
   <style>
     :root {
-      color-scheme: light;
-      --bg: #F7FBFF;
-      --text: #0B2A4A;
-      --muted: #4B6F8E;
-      --blue: #0F4C81;
-      --blue-2: #2563EB;
-      --line: #D6E8FF;
-      --soft: #EAF4FF;
+      color-scheme: dark;
+      --bg: #0A0A0F;
+      --surface: #12121A;
+      --surface-2: #1A1A26;
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(108,92,231,0.4);
+      --accent: #6C5CE7;
+      --accent-2: #00D2FF;
+      --accent-gradient: linear-gradient(135deg, #6C5CE7, #00D2FF);
+      --text: #FFFFFF;
+      --text-muted: #8888A0;
+      --success: #00E676;
+      --error: #FF5252;
+      --warning: #FFD740;
     }
 
     * { box-sizing: border-box; }
 
+    html { background: var(--bg); }
+
     body {
-      min-height: 100vh;
       margin: 0;
-      background:
-        radial-gradient(circle at 12% -8%, rgba(37,99,235,.13), transparent 34rem),
-        radial-gradient(circle at 90% 4%, rgba(94,160,232,.12), transparent 30rem),
-        linear-gradient(180deg, #F7FBFF 0%, #FFFFFF 32%, #F7FBFF 100%);
+      min-height: 100vh;
+      background: var(--bg);
       color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
       overflow-x: hidden;
     }
 
@@ -78,61 +94,82 @@
       z-index: -1;
       pointer-events: none;
       background-image:
-        linear-gradient(rgba(15,76,129,.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15,76,129,.045) 1px, transparent 1px);
-      background-size: 44px 44px;
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
       mask-image: radial-gradient(circle at 50% 18%, black 0%, transparent 72%);
     }
 
-    .text-gradient {
-      color: #0F4C81;
-      background: linear-gradient(135deg, #0B2A4A 0%, #0F4C81 42%, #2563EB 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .page-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(108,92,231,.22), transparent 30rem),
+        radial-gradient(circle at 86% 8%, rgba(0,210,255,.14), transparent 28rem),
+        radial-gradient(circle at 50% 100%, rgba(108,92,231,.08), transparent 34rem);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 20px 60px rgba(108,92,231,0.12);
+      transform: translateY(-2px);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #0F4C81 0%, #2563EB 100%);
-      color: #fff;
-      box-shadow: 0 16px 38px rgba(37,99,235,.22);
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      background: var(--accent-gradient);
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 0 30px rgba(108,92,231,0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
     }
 
-    .btn-primary:hover:not(:disabled) {
+    .btn-primary:hover {
       transform: scale(1.02);
-      filter: saturate(1.06);
-      box-shadow: 0 0 0 4px rgba(37,99,235,.08), 0 20px 54px rgba(37,99,235,.30);
+      box-shadow: var(--shadow-glowHover, 0 0 70px rgba(108,92,231,0.6));
+      filter: saturate(1.08);
     }
 
-    .glass-card {
-      background: rgba(255,255,255,.88);
-      border: 1px solid rgba(214,232,255,.95);
-      box-shadow: 0 24px 70px rgba(15,76,129,.12);
-      backdrop-filter: blur(18px);
+    .btn-primary:active { transform: scale(0.98); }
+
+    .hero-button {
+      width: 100%;
+      max-width: 480px;
+      padding: 20px 32px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(108,92,231,0.35);
+      animation: glowPulse 2.5s ease-in-out infinite;
     }
 
-    .card-hover {
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(108,92,231,0.3); }
+      50% { box-shadow: 0 0 60px rgba(108,92,231,0.6), 0 0 100px rgba(0,210,255,0.2); }
     }
 
-    .card-hover:hover {
-      transform: translateY(-2px);
-      border-color: #A9CDF8;
-      box-shadow: 0 24px 70px rgba(15,76,129,.14);
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1);
     }
 
-    .content-enter {
-      animation: contentIn .4s ease both;
-    }
-
-    @keyframes contentIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .dropdown-enter {
-      animation: dropdownIn .18s ease-out both;
+      animation: dropdownIn .2s ease-out both;
       transform-origin: top right;
     }
 
@@ -141,11 +178,93 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .spinner {
-      animation: spin .8s linear infinite;
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
     }
 
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+      background-size: 400px 100%;
+      animation: shimmer 1.4s ease infinite;
+      border-radius: 8px;
+      color: transparent !important;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      animation: borderPulse 3s ease-in-out infinite;
+      transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(108,92,231,0.05);
+    }
+
+    .upload-zone:hover .upload-icon,
+    .upload-zone.drag-over .upload-icon {
+      transform: scale(1.1);
+    }
+
+    @keyframes borderPulse {
+      0%, 100% { border-color: rgba(255,255,255,0.06); }
+      50% { border-color: rgba(108,92,231,0.3); }
+    }
+
+    .step-line::before {
+      content: "";
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      top: 43px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(108,92,231,.28), transparent);
+    }
+
+    .step-bg-number {
+      color: rgba(108,92,231,0.15);
+      line-height: .8;
+      pointer-events: none;
+    }
+
+    .toast {
+      animation: toastIn .22s ease-out both;
+    }
+
+    .toast.toast-out {
+      animation: toastOut .18s ease-in both;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(18px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(18px); }
+    }
+
+    .spinner { animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 767px) {
+      .mobile-fixed-cta {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: 24px;
+        z-index: 45;
+        width: auto;
+        max-width: none;
+      }
+
+      .mobile-cta-spacer { height: 96px; }
+
+      .step-line::before { display: none; }
+    }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -153,221 +272,210 @@
         animation-iteration-count: 1 !important;
         transition-duration: .001ms !important;
       }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
 
-<body class="font-sans antialiased selection:bg-brand-200 selection:text-brand-900">
-  <!-- =========================================================
-       LOADING STATE
-       ========================================================= -->
-  <div id="loading-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-brand-50/90 backdrop-blur-sm" role="status" aria-live="polite">
+<body>
+  <div class="page-glow"></div>
+
+  <!-- Toast notifications -->
+  <div id="toast-root" class="fixed bottom-5 right-5 z-[100] flex w-[calc(100%-2.5rem)] max-w-sm flex-col gap-3" aria-live="polite"></div>
+
+  <!-- Loading iniziale: verifica sessione reale -->
+  <div id="loading-screen" class="fixed inset-0 z-[90] flex items-center justify-center bg-dark-bg">
     <div class="flex flex-col items-center gap-4 text-center">
-      <div class="flex h-14 w-14 items-center justify-center rounded-2xl border border-brand-200 bg-white shadow-card">
-        <svg class="spinner h-6 w-6 text-brand-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"></path>
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-dark-surface shadow-glow">
+        <svg class="spinner h-6 w-6 text-accent-cyan" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"></path>
         </svg>
       </div>
-      <p class="text-sm font-bold text-brand-700">Verifica sessione in corso...</p>
+      <p class="text-sm font-semibold text-[var(--text-muted)]">Verifica sessione in corso...</p>
     </div>
   </div>
 
-  <!-- =========================================================
-       APP SHELL
-       ========================================================= -->
   <div id="app" class="hidden min-h-screen flex-col">
     <!-- =======================================================
          1. NAVBAR
          ======================================================= -->
-    <header class="sticky top-0 z-50 border-b border-brand-200/80 bg-white/86 backdrop-blur-xl shadow-sm shadow-brand-200/40">
-      <nav class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="Navigazione dashboard">
-        <a href="/" class="rounded-xl text-xl font-extrabold tracking-tight text-brand-900 outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" aria-label="Torna alla landing ConcorsoAI">
-          Concorso<span class="text-gradient">AI</span>
+    <header class="reveal sticky top-0 z-50 border-b border-[var(--border)] bg-[rgba(10,10,15,0.8)] backdrop-blur-[20px]">
+      <nav class="mx-auto flex h-16 max-w-[1100px] items-center justify-between px-4 md:px-6" aria-label="Navigazione dashboard">
+        <a href="/" class="group inline-flex items-center gap-2 rounded-xl text-xl font-extrabold tracking-tight text-white outline-none focus-visible:ring-2 focus-visible:ring-accent-purple" aria-label="Torna alla landing ConcorsoAI">
+          <span class="text-accent-cyan transition group-hover:scale-110">⚡</span>
+          <span>ConcorsoAI</span>
         </a>
 
         <div class="relative">
-          <button id="user-menu-button" type="button" class="flex items-center gap-3 rounded-2xl border border-brand-200 bg-white py-1.5 pl-1.5 pr-3 text-left shadow-sm transition hover:border-brand-300 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu">
-            <span id="avatar-initials" class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-brand-500 text-sm font-black text-white shadow-glowBlue">--</span>
-            <span class="hidden max-w-[11rem] truncate text-sm font-black text-brand-900 sm:block" id="navbar-name">Utente</span>
-            <svg class="h-4 w-4 text-brand-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
+          <button id="user-menu-button" type="button" class="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-dark-surface px-2 py-1.5 transition hover:border-[var(--border-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-purple" aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu">
+            <span id="avatar-initials" class="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#6C5CE7,#00D2FF)] text-sm font-black text-white shadow-glow">U</span>
+            <span id="navbar-name" class="hidden max-w-[10rem] truncate pr-2 text-sm font-semibold text-white md:block">Utente</span>
           </button>
 
-          <div id="user-menu" class="dropdown-enter absolute right-0 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-brand-200 bg-white p-2 shadow-card" role="menu" aria-labelledby="user-menu-button">
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-brand-700 transition hover:bg-brand-50 hover:text-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" role="menuitem">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM5 21a7 7 0 0 1 14 0" /></svg>
-              Il mio profilo
-            </a>
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-brand-700 transition hover:bg-brand-50 hover:text-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" role="menuitem">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.37a1.7 1.7 0 0 0-1 .92 1.7 1.7 0 0 0-.14.68V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.14-1.6 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-.92-1A1.7 1.7 0 0 0 3 13.86H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.6-1.14 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1-.92 1.7 1.7 0 0 0 .14-.68V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.14 1.6 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9c.42.18.74.5.92.92.1.22.15.46.15.7" /></svg>
-              Impostazioni
-            </a>
-            <div class="my-2 h-px bg-brand-200"></div>
-            <button id="logout-button" type="button" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-black text-red-700 transition hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300" role="menuitem">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 12h9m0 0-3-3m3 3-3 3" /></svg>
-              Esci
-            </button>
+          <div id="user-menu" class="dropdown-enter absolute right-0 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-[var(--border)] bg-dark-surface p-2 shadow-[0_24px_70px_rgba(0,0,0,.38)]" role="menu" aria-labelledby="user-menu-button">
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[var(--text-muted)] transition hover:bg-dark-surface2 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-purple" role="menuitem">Il mio profilo</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[var(--text-muted)] transition hover:bg-dark-surface2 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-purple" role="menuitem">Impostazioni</a>
+            <div class="my-2 h-px bg-white/10"></div>
+            <button id="logout-button" type="button" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-[var(--error)] transition hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400" role="menuitem">Esci</button>
           </div>
         </div>
       </nav>
     </header>
 
-    <!-- =======================================================
-         2. HERO WELCOME
-         ======================================================= -->
-    <main class="content-enter flex-1">
-      <section class="mx-auto max-w-5xl px-4 pb-10 pt-12 text-center sm:px-6 sm:pb-12 sm:pt-16 lg:px-8">
-        <p class="mb-3 text-xs font-black uppercase tracking-[0.28em] text-brand-600">Dashboard</p>
-        <h1 class="text-4xl font-bold tracking-[-0.04em] text-brand-900 sm:text-5xl lg:text-6xl">
-          Ciao, <span id="welcome-name" class="text-gradient">utente</span>!
+    <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 pb-16 pt-12 md:px-6">
+      <!-- =====================================================
+           2. HERO SECTION
+           ===================================================== -->
+      <section class="reveal text-center" style="transition-delay:.1s;">
+        <h1 class="text-4xl font-extrabold tracking-[-0.045em] text-white md:text-6xl">
+          Ciao, <span id="welcome-name">utente</span> 👋
         </h1>
-        <p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-brand-700 sm:text-lg">
-          Pronto ad allenarti per il tuo orale? Carica un bando e inizia la tua prima simulazione.
-        </p>
+        <p class="mx-auto mt-4 max-w-2xl text-base leading-8 text-[var(--text-muted)] md:text-lg">Pronto per la prossima simulazione?</p>
+      </section>
+
+      <!-- CTA principale -->
+      <section class="reveal mt-8 flex flex-col items-center text-center" style="transition-delay:.2s;">
+        <button id="start-simulation" type="button" class="btn-primary hero-button mobile-fixed-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg">
+          🎯 Inizia Simulazione
+        </button>
+        <p class="mt-4 text-sm font-medium text-[var(--text-muted)]">Scegli materia, difficoltà e durata</p>
+        <div class="mobile-cta-spacer md:hidden"></div>
       </section>
 
       <!-- =====================================================
-           3. MAIN UPLOAD CARD
+           4. STAT CARDS
            ===================================================== -->
-      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div class="glass-card rounded-[2rem] p-6 sm:p-8 lg:p-10">
-          <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-brand-50 text-brand-600 ring-1 ring-brand-200">
-            <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l4 4v4.5M14 3v5h5M7 21h5.5M7 17h4M7 13h5" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M18 21v-7m0 0-3 3m3-3 3 3" />
-            </svg>
-          </div>
-
-          <div class="mx-auto mt-6 max-w-2xl text-center">
-            <h2 class="text-3xl font-bold tracking-[-0.035em] text-brand-900">Inizia caricando il tuo primo bando</h2>
-            <p class="mt-4 text-sm leading-7 text-brand-700 sm:text-base">
-              Trascina il PDF del bando o clicca per selezionarlo. Massimo 200MB. La nostra AI estrarrà i contenuti e li userà per generare le domande della simulazione.
-            </p>
-          </div>
-
-          <div class="mx-auto mt-8 max-w-2xl">
-            <div class="group rounded-[1.75rem] border-2 border-dashed border-brand-200 bg-brand-50 p-8 text-center transition hover:border-brand-500 hover:bg-white sm:p-10" aria-label="Area caricamento PDF non ancora attiva">
-              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-brand-600 shadow-sm ring-1 ring-brand-200 transition group-hover:scale-105 group-hover:ring-brand-300">
-                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" />
-                </svg>
-              </div>
-              <p class="mt-5 text-base font-black text-brand-900">Trascina qui il tuo PDF o clicca per selezionare</p>
-              <p class="mt-2 text-sm font-semibold text-brand-600">PDF fino a 200MB</p>
-            </div>
-
-            <p class="mt-4 rounded-2xl border border-brand-200 bg-white px-4 py-3 text-center text-sm font-semibold text-brand-700">
-              📌 Funzionalità in arrivo. Stiamo finalizzando l'analisi PDF.
-            </p>
-          </div>
-        </div>
+      <section class="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <article class="card reveal p-5" style="transition-delay:.3s;">
+          <div class="mb-5 text-2xl text-accent-cyan">🎤</div>
+          <p id="stat-simulations" class="skeleton inline-block h-10 min-w-[58px] text-4xl font-extrabold tracking-[-0.05em]">0</p>
+          <p class="mt-2 text-sm font-medium text-[var(--text-muted)]">Simulazioni fatte</p>
+        </article>
+        <article class="card reveal p-5" style="transition-delay:.35s;">
+          <div class="mb-5 text-2xl text-accent-cyan">★</div>
+          <p id="stat-average" class="skeleton inline-block h-10 min-w-[58px] text-4xl font-extrabold tracking-[-0.05em]">0</p>
+          <p class="mt-2 text-sm font-medium text-[var(--text-muted)]">Voto medio</p>
+        </article>
+        <article class="card reveal p-5" style="transition-delay:.4s;">
+          <div class="mb-5 text-2xl text-accent-cyan">▣</div>
+          <p id="stat-documents" class="skeleton inline-block h-10 min-w-[58px] text-4xl font-extrabold tracking-[-0.05em]">0</p>
+          <p class="mt-2 text-sm font-medium text-[var(--text-muted)]">Bandi caricati</p>
+        </article>
+        <article class="card reveal p-5" style="transition-delay:.45s;">
+          <div class="mb-5 text-2xl text-accent-cyan">🔥</div>
+          <p id="stat-streak" class="skeleton inline-block h-10 min-w-[58px] text-4xl font-extrabold tracking-[-0.05em]">0</p>
+          <p class="mt-2 text-sm font-medium text-[var(--text-muted)]">Giorni di streak</p>
+        </article>
       </section>
 
       <!-- =====================================================
-           4. STATS PLACEHOLDER
+           5. DUE CARD AFFIANCATE
            ===================================================== -->
-      <section class="mx-auto mt-8 max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div class="grid gap-4 sm:grid-cols-3">
-          <article class="card-hover rounded-3xl border border-brand-200 bg-white p-6 shadow-card">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <p class="text-4xl font-black tracking-[-0.05em] text-brand-900">0</p>
-                <p class="mt-1 text-sm font-bold text-brand-700">Bandi caricati</p>
-              </div>
-              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-200">
-                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm7 0v5h5M8.5 13.5h7M8.5 17h4" /></svg>
-              </div>
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="card reveal p-6" style="transition-delay:.5s;">
+          <div class="mb-5 flex items-center justify-between gap-4">
+            <h2 class="text-xl font-bold tracking-[-0.02em] text-white">Ultime simulazioni</h2>
+            <a href="#" class="text-sm font-semibold text-accent-cyan transition hover:text-white">Vedi tutto →</a>
+          </div>
+          <div id="recent-simulations" class="space-y-3">
+            <div class="rounded-2xl border border-white/5 bg-dark-surface2 p-5 text-center">
+              <div class="text-3xl">🎤</div>
+              <p class="mt-3 text-sm leading-6 text-[var(--text-muted)]">Nessuna simulazione ancora. Inizia ora per vedere i tuoi progressi.</p>
             </div>
-          </article>
+          </div>
+        </article>
 
-          <article class="card-hover rounded-3xl border border-brand-200 bg-white p-6 shadow-card">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <p class="text-4xl font-black tracking-[-0.05em] text-brand-900">0</p>
-                <p class="mt-1 text-sm font-bold text-brand-700">Simulazioni fatte</p>
-              </div>
-              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-200">
-                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm7-3a7 7 0 0 1-14 0m7 7v3m-4 0h8" /></svg>
-              </div>
+        <article class="card reveal p-6" style="transition-delay:.5s;">
+          <div class="mb-5 flex items-center justify-between gap-4">
+            <h2 class="text-xl font-bold tracking-[-0.02em] text-white">Materie da migliorare</h2>
+          </div>
+          <div id="subjects-to-improve" class="space-y-3">
+            <div class="rounded-2xl border border-white/5 bg-dark-surface2 p-5 text-center">
+              <div class="text-3xl">📊</div>
+              <p class="mt-3 text-sm leading-6 text-[var(--text-muted)]">I tuoi punti deboli appariranno dopo le prime simulazioni.</p>
             </div>
-          </article>
-
-          <article class="card-hover rounded-3xl border border-brand-200 bg-white p-6 shadow-card">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <p class="text-4xl font-black tracking-[-0.05em] text-brand-900">—</p>
-                <p class="mt-1 text-sm font-bold text-brand-700">Voto medio</p>
-              </div>
-              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-200">
-                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 2.35 5.76 6.22.46-4.77 4.02 1.48 6.06L12 16.05 6.72 19.3l1.48-6.06-4.77-4.02 6.22-.46L12 3Z" /></svg>
-              </div>
-            </div>
-          </article>
-        </div>
+          </div>
+        </article>
       </section>
 
       <!-- =====================================================
-           5. EMPTY STATE TIPS
+           6. UPLOAD BANDO
            ===================================================== -->
-      <section class="mx-auto mt-8 max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-        <div class="rounded-[2rem] border border-brand-200 bg-white p-6 shadow-card sm:p-8">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <section class="reveal mt-6" style="transition-delay:.6s;">
+        <article class="card p-6 md:p-8">
+          <div class="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
-              <p class="text-xs font-black uppercase tracking-[0.28em] text-brand-600">Come iniziare</p>
-              <h2 class="mt-3 text-2xl font-bold tracking-[-0.03em] text-brand-900">Tre passaggi per la tua prima simulazione.</h2>
+              <p class="text-xs font-bold uppercase tracking-[0.22em] text-accent-cyan">Bando</p>
+              <h2 class="mt-2 text-2xl font-bold tracking-[-0.03em] text-white">Carica il PDF del tuo concorso</h2>
             </div>
+            <p class="text-sm text-[var(--text-muted)]">PDF fino a 200MB</p>
           </div>
 
-          <div class="mt-7 grid gap-4 md:grid-cols-3">
-            <article class="rounded-3xl border border-brand-200 bg-brand-50 p-5">
-              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-black text-brand-600 ring-1 ring-brand-200">1</div>
-              <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-brand-600 ring-1 ring-brand-200">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" /></svg>
-              </div>
-              <h3 class="font-black text-brand-900">Carica il tuo bando</h3>
-              <p class="mt-2 text-sm leading-6 text-brand-700">Trascina il PDF del bando del tuo concorso</p>
-            </article>
+          <label id="upload-zone" for="file-input" class="upload-zone block cursor-pointer rounded-3xl bg-dark-surface2 p-10 text-center">
+            <input id="file-input" type="file" accept="application/pdf,.pdf" class="sr-only" />
+            <div class="upload-icon mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 text-3xl transition-transform duration-200">⬆️</div>
+            <p class="mt-5 text-lg font-bold text-white">Trascina il PDF del tuo bando</p>
+            <p class="mt-2 text-sm text-[var(--text-muted)]">PDF fino a 200MB</p>
+          </label>
+        </article>
+      </section>
 
-            <article class="rounded-3xl border border-brand-200 bg-brand-50 p-5">
-              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-black text-brand-600 ring-1 ring-brand-200">2</div>
-              <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-brand-600 ring-1 ring-brand-200">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm7-3a7 7 0 0 1-14 0" /></svg>
-              </div>
-              <h3 class="font-black text-brand-900">Avvia una simulazione</h3>
-              <p class="mt-2 text-sm leading-6 text-brand-700">Scegli modalità e durata, poi inizia</p>
-            </article>
+      <!-- =====================================================
+           7. COME INIZIARE — visibile solo se 0 simulazioni
+           ===================================================== -->
+      <section id="how-it-works" class="reveal mt-8" style="transition-delay:.65s;">
+        <div class="card p-6 md:p-8">
+          <p class="text-xs font-bold uppercase tracking-[0.22em] text-accent-cyan">Come iniziare</p>
+          <h2 class="mt-2 text-2xl font-bold tracking-[-0.03em] text-white">Tre step per vedere i primi progressi.</h2>
 
-            <article class="rounded-3xl border border-brand-200 bg-brand-50 p-5">
-              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-black text-brand-600 ring-1 ring-brand-200">3</div>
-              <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-brand-600 ring-1 ring-brand-200">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5M4 19h17M8 16v-5M13 16V8M18 16v-8" /></svg>
+          <div class="step-line relative mt-8 grid gap-5 md:grid-cols-3">
+            <article class="relative rounded-2xl border border-white/5 bg-dark-surface2 p-5">
+              <div class="step-bg-number absolute right-4 top-4 text-7xl font-extrabold">01</div>
+              <div class="relative z-10">
+                <div class="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 text-accent-cyan">▣</div>
+                <h3 class="font-bold text-white">Carica il tuo bando</h3>
+                <p class="mt-2 text-sm leading-6 text-[var(--text-muted)]">Trascina il PDF del bando del tuo concorso</p>
               </div>
-              <h3 class="font-black text-brand-900">Ricevi feedback</h3>
-              <p class="mt-2 text-sm leading-6 text-brand-700">L'AI valuta chiarezza, struttura e contenuto</p>
+            </article>
+            <article class="relative rounded-2xl border border-white/5 bg-dark-surface2 p-5">
+              <div class="step-bg-number absolute right-4 top-4 text-7xl font-extrabold">02</div>
+              <div class="relative z-10">
+                <div class="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 text-accent-cyan">🎤</div>
+                <h3 class="font-bold text-white">Avvia una simulazione</h3>
+                <p class="mt-2 text-sm leading-6 text-[var(--text-muted)]">Scegli modalità e durata, poi inizia</p>
+              </div>
+            </article>
+            <article class="relative rounded-2xl border border-white/5 bg-dark-surface2 p-5">
+              <div class="step-bg-number absolute right-4 top-4 text-7xl font-extrabold">03</div>
+              <div class="relative z-10">
+                <div class="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 text-accent-cyan">★</div>
+                <h3 class="font-bold text-white">Ricevi feedback</h3>
+                <p class="mt-2 text-sm leading-6 text-[var(--text-muted)]">L'AI valuta chiarezza, struttura e contenuto</p>
+              </div>
             </article>
           </div>
         </div>
       </section>
     </main>
-
-    <!-- =======================================================
-         6. FOOTER MINIMAL
-         ======================================================= -->
-    <footer class="border-t border-brand-200 bg-white/70 px-4 py-6 text-center text-sm font-semibold text-brand-600">
-      ConcorsoAI © 2026 · Fatto con ❤️ in Italia
-    </footer>
   </div>
 
-  <!-- =========================================================
-       JAVASCRIPT: SESSION, USER DATA, DROPDOWN, LOGOUT
-       ========================================================= -->
   <script>
+    // =========================================================
+    // Supabase setup
+    // =========================================================
     const SUPABASE_URL = 'https://xhifnparcouxsypkjcmn.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dVYESGcHAV13d5aI1uC7wQ_pQ0r1qT2';
-    let supabaseClient = null;
+    const hasSupabaseConfig = SUPABASE_URL !== '[SUPABASE_URL_HERE]' && SUPABASE_KEY !== '[SUPABASE_PUBLISHABLE_KEY_HERE]';
+    const supabaseClient = hasSupabaseConfig && window.supabase
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+      : null;
 
-    const AUTH_URL = '/auth.html';
+    const AUTH_URL = 'auth.html';
 
+    // =========================================================
+    // Elementi DOM
+    // =========================================================
     const loadingScreen = document.getElementById('loading-screen');
     const app = document.getElementById('app');
     const welcomeName = document.getElementById('welcome-name');
@@ -376,23 +484,20 @@
     const menuButton = document.getElementById('user-menu-button');
     const userMenu = document.getElementById('user-menu');
     const logoutButton = document.getElementById('logout-button');
+    const toastRoot = document.getElementById('toast-root');
+    const fileInput = document.getElementById('file-input');
+    const uploadZone = document.getElementById('upload-zone');
 
-    function getSupabaseClient() {
-      const hasConfig =
-        SUPABASE_URL &&
-        SUPABASE_KEY &&
-        SUPABASE_URL !== '[SUPABASE_URL_HERE]' &&
-        SUPABASE_KEY !== '[SUPABASE_PUBLISHABLE_KEY_HERE]';
+    const statEls = {
+      simulations: document.getElementById('stat-simulations'),
+      average: document.getElementById('stat-average'),
+      documents: document.getElementById('stat-documents'),
+      streak: document.getElementById('stat-streak')
+    };
 
-      if (!hasConfig || !window.supabase) return null;
-
-      if (!supabaseClient) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }
-
-      return supabaseClient;
-    }
-
+    // =========================================================
+    // Utility utente
+    // =========================================================
     function getDisplayName(user) {
       const fullName = user?.user_metadata?.full_name || user?.user_metadata?.name;
       if (fullName && String(fullName).trim().length > 0) return String(fullName).trim();
@@ -403,13 +508,8 @@
     function getInitials(nameOrEmail) {
       const cleaned = String(nameOrEmail || '').trim();
       if (!cleaned) return 'U';
-
-      const withoutEmailDomain = cleaned.includes('@') ? cleaned.split('@')[0] : cleaned;
-      const parts = withoutEmailDomain
-        .replace(/[._-]+/g, ' ')
-        .split(' ')
-        .filter(Boolean);
-
+      const source = cleaned.includes('@') ? cleaned.split('@')[0] : cleaned;
+      const parts = source.replace(/[._-]+/g, ' ').split(' ').filter(Boolean);
       if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
       return parts[0].slice(0, 2).toUpperCase();
     }
@@ -421,40 +521,225 @@
       avatarInitials.textContent = getInitials(name || user.email);
     }
 
-    function showApp() {
-      loadingScreen.classList.add('hidden');
-      app.classList.remove('hidden');
-      app.classList.add('flex');
+    // =========================================================
+    // Toast notification
+    // =========================================================
+    function showToast(message, type = 'success') {
+      const colorMap = {
+        success: 'var(--success)',
+        error: 'var(--error)',
+        warning: 'var(--warning)'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = 'toast rounded-2xl border bg-dark-surface px-4 py-3 text-sm font-semibold shadow-[0_20px_60px_rgba(0,0,0,.35)]';
+      toast.style.borderColor = colorMap[type] || colorMap.success;
+      toast.style.color = colorMap[type] || colorMap.success;
+      toast.textContent = message;
+      toastRoot.appendChild(toast);
+
+      window.setTimeout(() => {
+        toast.classList.add('toast-out');
+        window.setTimeout(() => toast.remove(), 180);
+      }, 3000);
     }
 
-    function redirectToAuth() {
-      window.location.href = AUTH_URL;
-    }
+    // =========================================================
+    // Count-up stats
+    // =========================================================
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-    async function initDashboard() {
-      const client = getSupabaseClient();
+    function clearSkeleton(el) { el.classList.remove('skeleton'); }
 
-      // Se i placeholder non sono ancora configurati, non lasciamo la pagina in loading infinito.
-      // In produzione, dopo aver sostituito le chiavi, verrà verificata la sessione reale.
-      if (!client) {
-        loadingScreen.innerHTML = '<div class="mx-4 max-w-md rounded-3xl border border-red-200 bg-red-50 p-6 text-center shadow-card"><h1 class="text-xl font-black text-red-800">Supabase non configurato</h1><p class="mt-2 text-sm leading-6 text-red-700">Sostituisci [SUPABASE_URL_HERE] e [SUPABASE_PUBLISHABLE_KEY_HERE] per verificare la sessione.</p><a href="/auth.html" class="mt-5 inline-flex rounded-2xl bg-white px-4 py-2 text-sm font-black text-red-700 ring-1 ring-red-200">Vai al login</a></div>';
+    function animateNumber(el, value, options = {}) {
+      clearSkeleton(el);
+      const numericValue = Number(value || 0);
+      if (numericValue <= 0) {
+        el.textContent = '—';
         return;
       }
 
-      try {
-        const { data, error } = await client.auth.getSession();
-        if (error || !data.session) {
-          redirectToAuth();
-          return;
-        }
+      const duration = 1200;
+      const decimals = options.decimals || 0;
+      const start = performance.now();
 
-        renderUser(data.session.user);
-        showApp();
-      } catch (error) {
-        redirectToAuth();
+      function frame(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = easeOutCubic(progress);
+        const current = numericValue * eased;
+        el.textContent = decimals > 0 ? current.toFixed(decimals) : Math.round(current).toString();
+        if (progress < 1) requestAnimationFrame(frame);
+        else el.textContent = decimals > 0 ? numericValue.toFixed(decimals) : Math.round(numericValue).toString();
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function setEmptyStats() {
+      Object.values(statEls).forEach((el) => {
+        clearSkeleton(el);
+        el.textContent = '—';
+      });
+    }
+
+    // =========================================================
+    // Lettura statistiche database
+    // =========================================================
+    async function safeCount(table, userId) {
+      try {
+        const { count, error } = await supabaseClient
+          .from(table)
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', userId);
+        if (error) return 0;
+        return count || 0;
+      } catch (_) {
+        return 0;
       }
     }
 
+    async function loadSimulations(userId) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('simulations')
+          .select('id, subject, score, created_at')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        if (error) return [];
+        return data || [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function calculateStreak(simulations) {
+      if (!simulations.length) return 0;
+      const uniqueDays = [...new Set(simulations
+        .map((item) => item.created_at ? new Date(item.created_at).toISOString().slice(0, 10) : null)
+        .filter(Boolean))]
+        .sort()
+        .reverse();
+
+      let streak = 0;
+      const cursor = new Date();
+      for (const day of uniqueDays) {
+        const expected = cursor.toISOString().slice(0, 10);
+        if (day === expected) {
+          streak += 1;
+          cursor.setDate(cursor.getDate() - 1);
+        } else if (streak === 0) {
+          cursor.setDate(cursor.getDate() - 1);
+          if (day === cursor.toISOString().slice(0, 10)) {
+            streak += 1;
+            cursor.setDate(cursor.getDate() - 1);
+          } else break;
+        } else break;
+      }
+      return streak;
+    }
+
+    function renderRecentSimulations(simulations) {
+      const container = document.getElementById('recent-simulations');
+      const recent = simulations.slice(0, 3);
+      if (!recent.length) return;
+
+      container.innerHTML = recent.map((item) => {
+        const subject = item.subject || 'Simulazione orale';
+        const score = typeof item.score === 'number' ? item.score.toFixed(1) : '—';
+        const date = item.created_at ? new Date(item.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) : '';
+        return `
+          <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-dark-surface2 p-4">
+            <div>
+              <p class="font-semibold text-white">${subject}</p>
+              <p class="mt-1 text-xs text-[var(--text-muted)]">${date}</p>
+            </div>
+            <div class="rounded-xl bg-white/5 px-3 py-1.5 text-sm font-bold text-accent-cyan">${score}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSubjectsToImprove(simulations) {
+      const container = document.getElementById('subjects-to-improve');
+      const bySubject = new Map();
+
+      simulations.forEach((item) => {
+        if (!item.subject || typeof item.score !== 'number') return;
+        if (!bySubject.has(item.subject)) bySubject.set(item.subject, []);
+        bySubject.get(item.subject).push(item.score);
+      });
+
+      const subjects = [...bySubject.entries()].map(([subject, scores]) => ({
+        subject,
+        avg: scores.reduce((a, b) => a + b, 0) / scores.length
+      })).sort((a, b) => a.avg - b.avg).slice(0, 4);
+
+      if (!subjects.length) return;
+
+      container.innerHTML = subjects.map((item) => {
+        let color = 'var(--success)';
+        if (item.avg < 5) color = 'var(--error)';
+        else if (item.avg <= 7) color = 'var(--warning)';
+
+        return `
+          <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-dark-surface2 p-4">
+            <p class="font-semibold text-white">${item.subject}</p>
+            <span class="rounded-xl bg-white/5 px-3 py-1.5 text-sm font-extrabold" style="color:${color}">${item.avg.toFixed(1)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadStats(userId) {
+      const [simulations, documentsCount] = await Promise.all([
+        loadSimulations(userId),
+        safeCount('documents', userId)
+      ]);
+
+      const simulationsCount = simulations.length;
+      const scored = simulations.filter((item) => typeof item.score === 'number');
+      const average = scored.length ? scored.reduce((sum, item) => sum + item.score, 0) / scored.length : 0;
+      const streak = calculateStreak(simulations);
+
+      animateNumber(statEls.simulations, simulationsCount);
+      animateNumber(statEls.average, average, { decimals: 1 });
+      animateNumber(statEls.documents, documentsCount);
+      animateNumber(statEls.streak, streak);
+
+      renderRecentSimulations(simulations);
+      renderSubjectsToImprove(simulations);
+
+      if (simulationsCount > 0) {
+        document.getElementById('how-it-works').style.display = 'none';
+      }
+    }
+
+    // =========================================================
+    // Reveal animations
+    // =========================================================
+    function initReveal() {
+      const items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        items.forEach((item) => item.classList.add('is-visible'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      items.forEach((item) => observer.observe(item));
+    }
+
+    // =========================================================
+    // Menu avatar + logout
+    // =========================================================
     function openMenu() {
       userMenu.classList.remove('hidden');
       menuButton.setAttribute('aria-expanded', 'true');
@@ -470,20 +755,12 @@
     }
 
     async function logout() {
-      const client = getSupabaseClient();
-      if (!client) {
-        redirectToAuth();
+      if (!supabaseClient) {
+        window.location.href = AUTH_URL;
         return;
       }
-
-      logoutButton.disabled = true;
-      logoutButton.classList.add('opacity-60', 'cursor-not-allowed');
-
-      try {
-        await client.auth.signOut();
-      } finally {
-        redirectToAuth();
-      }
+      await supabaseClient.auth.signOut();
+      window.location.href = AUTH_URL;
     }
 
     menuButton.addEventListener('click', (event) => {
@@ -501,7 +778,75 @@
 
     logoutButton.addEventListener('click', logout);
 
+    // =========================================================
+    // Upload placeholder + toast
+    // =========================================================
+    ['dragenter', 'dragover'].forEach((eventName) => {
+      uploadZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        uploadZone.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach((eventName) => {
+      uploadZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        uploadZone.classList.remove('drag-over');
+      });
+    });
+
+    uploadZone.addEventListener('drop', (event) => {
+      const file = event.dataTransfer.files?.[0];
+      if (!file) return;
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        showToast('Carica un file PDF', 'warning');
+        return;
+      }
+      showToast('Bando caricato ✓', 'success');
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        showToast('Carica un file PDF', 'warning');
+        return;
+      }
+      showToast('Bando caricato ✓', 'success');
+    });
+
+    document.getElementById('start-simulation').addEventListener('click', () => {
+      showToast('Le simulazioni saranno disponibili a breve', 'warning');
+    });
+
+    // =========================================================
+    // Init dashboard: sessione reale + dati utente
+    // =========================================================
+    async function initDashboard() {
+      if (!supabaseClient) {
+        window.location.href = AUTH_URL;
+        return;
+      }
+
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        window.location.href = AUTH_URL;
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+      const user = userError ? sessionData.session.user : userData.user;
+
+      renderUser(user);
+      loadingScreen.classList.add('hidden');
+      app.classList.remove('hidden');
+      app.classList.add('flex');
+      initReveal();
+
+      await loadStats(user.id);
+    }
+
     initDashboard();
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1372830ef2f9985',t:'MTc4Mjc1OTQ0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
