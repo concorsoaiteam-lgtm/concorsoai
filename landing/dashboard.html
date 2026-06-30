@@ -1418,11 +1418,11 @@
           .from('bandi')
           .insert({
             user_id: user.id,
-            nome: file.name.replace(/\.pdf$/i, ''),
-            num_chunks: chunks.length,
-            num_pagine: totalPages,
-            num_parole: words.length,
-            tipo: 'pdf'
+            filename: file.name,
+            file_path: '',
+            file_size: file.size,
+            total_pages: totalPages,
+            processing_status: 'completed'
           })
           .select()
           .single();
@@ -1433,9 +1433,12 @@
         for (let i = 0; i < chunks.length; i += batchSize) {
           const batch = chunks.slice(i, i + batchSize).map((content, idx) => ({
             user_id: user.id,
-            bando_id: bando.id,
             content,
-            chunk_index: i + idx
+            metadata: {
+              bando_id: bando.id,
+              bando_filename: file.name,
+              chunk_index: i + idx
+            }
           }));
 
           const { error } = await getSupabase().from('chunks').insert(batch);
@@ -1473,10 +1476,11 @@
           .from('bandi')
           .insert({
             user_id: user.id,
-            nome: 'Testo incollato - ' + new Date().toLocaleDateString('it'),
-            num_chunks: chunks.length,
-            num_parole: words.length,
-            tipo: 'testo'
+            filename: 'Testo - ' + new Date().toLocaleDateString('it'),
+            file_path: '',
+            file_size: 0,
+            total_pages: 0,
+            processing_status: 'completed'
           })
           .select()
           .single();
@@ -1485,9 +1489,12 @@
 
         const chunksData = chunks.map((content, index) => ({
           user_id: user.id,
-          bando_id: bando.id,
           content,
-          chunk_index: index
+          metadata: {
+            bando_id: bando.id,
+            bando_filename: 'Testo incollato',
+            chunk_index: index
+          }
         }));
 
         const { error: chunksError } = await getSupabase().from('chunks').insert(chunksData);
@@ -1517,10 +1524,11 @@
           .from('bandi')
           .insert({
             user_id: user.id,
-            nome: selected.join(', '),
-            num_chunks: 0,
-            tipo: 'materie',
-            materie: selected
+            filename: selected.join(', '),
+            file_path: '',
+            file_size: 0,
+            total_pages: 0,
+            processing_status: 'completed'
           })
           .select()
           .single();
