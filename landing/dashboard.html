@@ -407,8 +407,38 @@
 
     .upload-section { margin-top: 18px; }
 
-    .upload-drop {
+    .upload-tabs {
+      display: flex;
+      gap: 8px;
       margin-top: 20px;
+      padding: 6px;
+      border: 1px solid rgba(37,99,235,.14);
+      border-radius: 18px;
+      background: rgba(247,251,255,.78);
+      overflow-x: auto;
+    }
+
+    .upload-tab {
+      flex: 1 0 auto;
+      border-radius: 13px;
+      padding: 10px 12px;
+      font-size: .82rem;
+      font-weight: 900;
+      color: var(--text-secondary);
+      transition: all .2s ease;
+      white-space: nowrap;
+    }
+
+    .upload-tab.active {
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #2563EB, #0F4C81);
+      box-shadow: 0 10px 24px rgba(37,99,235,.18);
+    }
+
+    .upload-panel { margin-top: 16px; }
+    .upload-panel.hidden { display: none; }
+
+    .upload-drop {
       border: 2px dashed rgba(169,205,248,.8);
       border-radius: 20px;
       padding: 44px;
@@ -421,7 +451,7 @@
     .upload-drop:hover,
     .upload-drop.drag-over {
       border-color: var(--accent-2);
-      background: rgba(37,99,235,.06);
+      background: rgba(37,99,235,.05);
     }
 
     .upload-icon {
@@ -434,8 +464,85 @@
 
     .upload-drop:hover .upload-icon,
     .upload-drop.drag-over .upload-icon {
-      transform: translateY(-3px) scale(1.06);
+      transform: translateY(-3px) scale(1.14);
       color: var(--accent-2);
+    }
+
+    .upload-textarea {
+      min-height: 200px;
+      width: 100%;
+      resize: vertical;
+      border: 1px solid rgba(37,99,235,.16);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,.84);
+      color: var(--text);
+      font-size: .92rem;
+      line-height: 1.7;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .upload-textarea:focus {
+      border-color: rgba(37,99,235,.38);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    }
+
+    .upload-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .upload-secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: #2563EB;
+      color: #FFFFFF;
+      font-size: .84rem;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(37,99,235,.18);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .upload-secondary-btn:hover { transform: translateY(-1px); background: #0F4C81; }
+
+    .word-count,
+    .materie-note {
+      font-size: .82rem;
+      font-weight: 750;
+      color: var(--text-muted);
+    }
+
+    .materie-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .materia-toggle {
+      border: 1px solid rgba(37,99,235,.16);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.76);
+      color: var(--text-secondary);
+      font-size: .84rem;
+      font-weight: 850;
+      text-align: left;
+      transition: all .2s ease;
+    }
+
+    .materia-toggle.active {
+      border-color: rgba(37,99,235,.44);
+      background: rgba(37,99,235,.08);
+      color: #0B2A4A;
+      box-shadow: inset 0 0 0 1px rgba(37,99,235,.1);
     }
 
     .upload-progress-list {
@@ -451,6 +558,8 @@
       background: rgba(255,255,255,.72);
       transition: border-color .2s ease, background .2s ease;
     }
+
+    .upload-progress-card.done { border-color: rgba(22,163,74,.32); }
 
     .upload-progress-card.error {
       border-color: rgba(220,38,38,.35);
@@ -475,8 +584,15 @@
       color: var(--text);
     }
 
-    .upload-progress-status {
+    .upload-progress-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       flex-shrink: 0;
+    }
+
+    .upload-progress-status,
+    .upload-progress-percent {
       font-size: .76rem;
       font-weight: 800;
       color: var(--text-muted);
@@ -494,8 +610,11 @@
       height: 100%;
       border-radius: 2px;
       background: #2563EB;
-      transition: width .25s ease;
+      transition: width .25s ease, background .2s ease;
     }
+
+    .upload-progress-card.done .upload-progress-fill { background: var(--success); }
+    .upload-progress-card.error .upload-progress-fill { background: var(--error); }
 
     .upload-spinner {
       display: inline-block;
@@ -513,6 +632,12 @@
     .upload-error-icon { color: var(--error); margin-right: 6px; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .upload-tab { padding: 9px 10px; font-size: .76rem; }
+      .materie-grid { grid-template-columns: 1fr; }
+      .upload-drop { padding: 32px 18px; }
+    }
 
     #onboarding { margin-top: 18px; }
 
@@ -771,16 +896,42 @@
 
       <!-- Upload bando -->
       <section class="upload-section card">
-        <h2 class="card-title">Carica il tuo bando</h2>
-        <p class="mt-2 text-sm font-semibold text-brand-700">PDF fino a 200MB</p>
-        <label id="uploadDrop" for="fileInput" class="upload-drop block">
-          <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple class="sr-only" />
-          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" />
-          </svg>
-          <p class="text-sm font-bold text-brand-700">Trascina uno o più PDF o clicca per selezionare</p>
-        </label>
-        <div id="uploadProgressList" class="upload-progress-list"></div>
+        <h2 class="card-title">Aggiungi materiale di studio</h2>
+        <p class="mt-2 text-sm font-semibold text-brand-700">PDF, testo libero o materie generali</p>
+
+        <div class="upload-tabs" role="tablist" aria-label="Modalità di input">
+          <button class="upload-tab active" type="button" data-upload-tab="pdf">📄 Carica PDF</button>
+          <button class="upload-tab" type="button" data-upload-tab="text">✏️ Incolla testo</button>
+          <button class="upload-tab" type="button" data-upload-tab="subjects">📚 Scegli materie</button>
+        </div>
+
+        <div id="uploadPanelPdf" class="upload-panel">
+          <p class="mb-3 text-sm font-semibold text-brand-700">PDF fino a 500MB per file</p>
+          <label id="uploadDrop" for="fileInput" class="upload-drop block">
+            <input id="fileInput" type="file" accept=".pdf,application/pdf" multiple class="sr-only" />
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" />
+            </svg>
+            <p id="uploadDropText" class="text-sm font-bold text-brand-700">Trascina uno o più PDF o clicca per selezionare</p>
+          </label>
+          <div id="uploadProgressList" class="upload-progress-list"></div>
+        </div>
+
+        <div id="uploadPanelText" class="upload-panel hidden">
+          <textarea id="freeTextInput" class="upload-textarea" placeholder="Incolla qui il programma del concorso, articoli di legge, appunti..."></textarea>
+          <div class="upload-actions-row">
+            <p id="wordCounter" class="word-count">0 parole</p>
+            <button id="saveTextButton" class="upload-secondary-btn" type="button">Salva testo</button>
+          </div>
+        </div>
+
+        <div id="uploadPanelSubjects" class="upload-panel hidden">
+          <div id="materieGrid" class="materie-grid"></div>
+          <div class="upload-actions-row">
+            <p class="materie-note">Domande generali sulla materia, non specifiche al tuo bando</p>
+            <button id="saveMaterieButton" class="upload-secondary-btn" type="button">Conferma materie</button>
+          </div>
+        </div>
       </section>
 
       <!-- Onboarding -->
@@ -827,7 +978,19 @@
     const ctaButton = document.getElementById('ctaButton');
     const fileInput = document.getElementById('fileInput');
     const uploadDrop = document.getElementById('uploadDrop');
+    const uploadDropText = document.getElementById('uploadDropText');
     const uploadProgressList = document.getElementById('uploadProgressList');
+    const uploadTabs = document.querySelectorAll('[data-upload-tab]');
+    const uploadPanels = {
+      pdf: document.getElementById('uploadPanelPdf'),
+      text: document.getElementById('uploadPanelText'),
+      subjects: document.getElementById('uploadPanelSubjects')
+    };
+    const freeTextInput = document.getElementById('freeTextInput');
+    const wordCounter = document.getElementById('wordCounter');
+    const saveTextButton = document.getElementById('saveTextButton');
+    const materieGrid = document.getElementById('materieGrid');
+    const saveMaterieButton = document.getElementById('saveMaterieButton');
     let currentUser = null;
 
     if (window.pdfjsLib) {
@@ -1092,155 +1255,88 @@
     }
 
     const uploadCards = new Map();
-    const MAX_PDF_SIZE = 200 * 1024 * 1024;
+    const selectedMaterie = new Set();
+    const MAX_PDF_SIZE = 500 * 1024 * 1024;
+    const MATERIE = [
+      'Diritto Amministrativo',
+      'Diritto Costituzionale',
+      'Diritto Civile',
+      'Diritto Penale',
+      'Contabilità Pubblica',
+      'Diritto del Lavoro',
+      'Informatica',
+      'Inglese',
+      'Diritto Tributario',
+      'Diritto Europeo'
+    ];
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
     }
 
-    function createUploadCard(file) {
-      const key = file.name;
+    function getSupabase() {
+      if (!supabaseClient) throw new Error('Supabase non disponibile');
+      return supabaseClient;
+    }
+
+    function chunkText(text) {
+      const words = text.split(/\s+/).filter(w => w.length > 0);
+      const chunkSize = 500;
+      const overlap = 50;
+      const chunks = [];
+
+      for (let i = 0; i < words.length; i += chunkSize - overlap) {
+        const chunk = words.slice(i, i + chunkSize).join(' ');
+        if (chunk.trim().length > 10) chunks.push(chunk);
+      }
+
+      return { words, chunks };
+    }
+
+    function bumpBandi(count = 1) {
+      state.bandi += count;
+      setStat('bandi', state.bandi);
+    }
+
+    function createProgressCard(fileName) {
+      const key = fileName;
       const card = document.createElement('div');
       card.className = 'upload-progress-card';
       card.innerHTML = `
         <div class="upload-progress-head">
-          <p class="upload-progress-name">${escapeHtml(file.name)}</p>
-          <p class="upload-progress-status"><span class="upload-spinner"></span>Caricamento...</p>
+          <p class="upload-progress-name">${escapeHtml(fileName)}</p>
+          <div class="upload-progress-meta">
+            <p class="upload-progress-status"><span class="upload-spinner"></span>In attesa...</p>
+            <p class="upload-progress-percent">0%</p>
+          </div>
         </div>
         <div class="upload-progress-bar"><div class="upload-progress-fill"></div></div>
       `;
       uploadProgressList.appendChild(card);
       uploadCards.set(key, card);
+      if (window.gsap) gsap.from(card, { opacity: 0, y: 8, duration: .22, ease: 'power2.out' });
       return card;
     }
 
-    function updateProgress(fileName, percent, status) {
+    function updateProgressCard(fileName, status, message, percent = 0) {
       const card = uploadCards.get(fileName);
       if (!card) return;
       const fill = card.querySelector('.upload-progress-fill');
       const statusEl = card.querySelector('.upload-progress-status');
-      fill.style.width = Math.max(0, Math.min(100, percent)) + '%';
-      if (status) statusEl.innerHTML = `<span class="upload-spinner"></span>${escapeHtml(status)}`;
-    }
+      const percentEl = card.querySelector('.upload-progress-percent');
+      const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
 
-    function completeProgress(fileName) {
-      const card = uploadCards.get(fileName);
-      if (!card) return;
-      card.querySelector('.upload-progress-fill').style.width = '100%';
-      card.querySelector('.upload-progress-status').innerHTML = '<span class="upload-check">✓</span>Completato';
-    }
+      card.classList.toggle('done', status === 'done');
+      card.classList.toggle('error', status === 'error');
+      fill.style.width = safePercent + '%';
+      percentEl.textContent = safePercent + '%';
 
-    function failProgress(fileName, message) {
-      const card = uploadCards.get(fileName);
-      if (!card) return;
-      card.classList.add('error');
-      card.querySelector('.upload-progress-status').innerHTML = `<span class="upload-error-icon">✗</span>${escapeHtml(message)}`;
-    }
-
-    function validatePdf(file) {
-      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-      if (!isPdf) throw new Error('Solo file PDF sono accettati');
-      if (file.size > MAX_PDF_SIZE) throw new Error('File troppo grande');
-    }
-
-    async function processFile(file) {
-      createUploadCard(file);
-
-      try {
-        validatePdf(file);
-        if (!currentUser) throw new Error('Utente non autenticato');
-        if (!window.pdfjsLib) throw new Error('PDF.js non disponibile');
-
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = currentUser.id + '/' + Date.now() + '_' + safeName;
-
-        try {
-          updateProgress(file.name, 8, 'Caricamento...');
-          const { error } = await supabaseClient.storage
-            .from('bandi-pdf')
-            .upload(path, file, {
-              cacheControl: '3600',
-              upsert: false
-            });
-          if (error) throw error;
-          updateProgress(file.name, 25, 'Estrazione testo...');
-        } catch (error) {
-          throw new Error(error.message || 'Errore Supabase');
-        }
-
-        let pdf;
-        let fullText = '';
-        try {
-          const arrayBuffer = await file.arrayBuffer();
-          pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            fullText += content.items.map(item => item.str).join(' ') + '\n';
-            updateProgress(file.name, 25 + (i / pdf.numPages) * 50, 'Estrazione testo...');
-          }
-        } catch (error) {
-          throw new Error(error.message || 'Errore estrazione testo');
-        }
-
-        updateProgress(file.name, 78, 'Salvando...');
-        const words = fullText.split(/\s+/).filter(Boolean);
-        const chunkSize = 500;
-        const overlap = 50;
-        const chunks = [];
-
-        for (let i = 0; i < words.length; i += chunkSize - overlap) {
-          const chunk = words.slice(i, i + chunkSize).join(' ');
-          if (chunk.trim().length > 0) chunks.push(chunk);
-        }
-
-        let bandoId = null;
-        try {
-          const { data: bandoData, error: bandoError } = await supabaseClient
-            .from('bandi')
-            .insert({
-              user_id: currentUser.id,
-              nome: file.name,
-              storage_path: path,
-              num_chunks: chunks.length,
-              num_pagine: pdf.numPages,
-              created_at: new Date().toISOString()
-            })
-            .select('id')
-            .single();
-
-          if (bandoError) throw bandoError;
-          bandoId = bandoData?.id || null;
-        } catch (error) {
-          throw new Error(error.message || 'Errore salvataggio bando');
-        }
-
-        try {
-          const chunksData = chunks.map((content, index) => ({
-            user_id: currentUser.id,
-            bando_id: bandoId,
-            content,
-            chunk_index: index,
-            created_at: new Date().toISOString()
-          }));
-
-          if (chunksData.length) {
-            const { error: chunksError } = await supabaseClient
-              .from('chunks')
-              .insert(chunksData);
-            if (chunksError) throw chunksError;
-          }
-        } catch (error) {
-          throw new Error(error.message || 'Errore salvataggio chunks');
-        }
-
-        completeProgress(file.name);
-        return { ok: true, file };
-      } catch (error) {
-        const message = error.message || 'Errore durante il caricamento';
-        failProgress(file.name, message);
-        return { ok: false, file, error: message };
+      if (status === 'done') {
+        statusEl.innerHTML = `<span class="upload-check">✓</span>${escapeHtml(message)}`;
+      } else if (status === 'error') {
+        statusEl.innerHTML = `<span class="upload-error-icon">✗</span>${escapeHtml(message)}`;
+      } else {
+        statusEl.innerHTML = `<span class="upload-spinner"></span>${escapeHtml(message)}`;
       }
     }
 
@@ -1248,29 +1344,224 @@
       const files = Array.from(fileList || []);
       if (!files.length) return;
 
-      const results = await Promise.all(files.map(file => processFile(file)));
-      const successCount = results.filter(result => result.ok).length;
+      try {
+        for (const file of files) {
+          if (!file.name.toLowerCase().endsWith('.pdf')) {
+            showToast(file.name + ': solo PDF accettati', 'error');
+            return;
+          }
+          if (file.size > MAX_PDF_SIZE) {
+            showToast(file.name + ': massimo 500MB', 'error');
+            return;
+          }
+        }
 
-      if (successCount > 0) {
-        state.bandi += successCount;
-        setStat('bandi', state.bandi);
-        showToast(`${successCount} bandi caricati con successo ✓`, 'success');
+        files.forEach(f => createProgressCard(f.name));
+
+        let successCount = 0;
+        for (const file of files) {
+          try {
+            await processSingleFile(file);
+            successCount += 1;
+            bumpBandi(1);
+          } catch (err) {
+            updateProgressCard(file.name, 'error', err.message || 'Errore', 100);
+            showToast(file.name + ': ' + (err.message || 'errore'), 'error');
+          }
+        }
+
+        if (successCount > 0) showToast(successCount + ' bandi caricati con successo ✓', 'success');
+      } catch (error) {
+        showToast(error.message || 'Errore upload', 'error');
       }
+    }
 
-      const failed = results.find(result => !result.ok);
-      if (failed && !successCount) showToast(failed.error, 'error');
+    async function processSingleFile(file) {
+      let pdf = null;
+      let fullText = '';
+      let totalPages = 0;
 
-      setTimeout(() => {
-        uploadProgressList.innerHTML = '';
-        uploadCards.clear();
-      }, 2000);
+      try {
+        updateProgressCard(file.name, 'loading', 'Lettura PDF...', 3);
+
+        const arrayBuffer = await file.arrayBuffer();
+        pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        totalPages = pdf.numPages;
+
+        for (let i = 1; i <= totalPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map(item => item.str).join(' ');
+          fullText += pageText + '\n';
+          page.cleanup();
+
+          const percent = Math.round((i / totalPages) * 70);
+          updateProgressCard(file.name, 'loading', 'Estrazione testo: pagina ' + i + '/' + totalPages, percent);
+        }
+
+        await pdf.destroy();
+        pdf = null;
+
+        updateProgressCard(file.name, 'loading', 'Creazione chunks...', 75);
+        const { words, chunks } = chunkText(fullText);
+        fullText = '';
+
+        if (!chunks.length) throw new Error('Nessun testo estraibile dal PDF');
+
+        updateProgressCard(file.name, 'loading', 'Salvataggio...', 85);
+
+        const { data: { user }, error: userError } = await getSupabase().auth.getUser();
+        if (userError) throw userError;
+        if (!user) throw new Error('Utente non autenticato');
+
+        const { data: bando, error: bandoErr } = await getSupabase()
+          .from('bandi')
+          .insert({
+            user_id: user.id,
+            nome: file.name.replace(/\.pdf$/i, ''),
+            num_chunks: chunks.length,
+            num_pagine: totalPages,
+            num_parole: words.length,
+            tipo: 'pdf'
+          })
+          .select()
+          .single();
+
+        if (bandoErr) throw bandoErr;
+
+        const batchSize = 50;
+        for (let i = 0; i < chunks.length; i += batchSize) {
+          const batch = chunks.slice(i, i + batchSize).map((content, idx) => ({
+            user_id: user.id,
+            bando_id: bando.id,
+            content,
+            chunk_index: i + idx
+          }));
+
+          const { error } = await getSupabase().from('chunks').insert(batch);
+          if (error) throw error;
+
+          const percent = 85 + Math.round(((i + batchSize) / chunks.length) * 15);
+          updateProgressCard(file.name, 'loading', 'Salvataggio chunks...', Math.min(percent, 99));
+        }
+
+        updateProgressCard(file.name, 'done', chunks.length + ' chunks salvati ✓', 100);
+      } catch (error) {
+        if (pdf) {
+          try { await pdf.destroy(); } catch (_) {}
+        }
+        fullText = '';
+        throw error;
+      }
+    }
+
+    async function saveText(text) {
+      try {
+        if (text.trim().length < 50) {
+          showToast('Inserisci almeno 50 caratteri', 'error');
+          return;
+        }
+
+        const { data: { user }, error: userError } = await getSupabase().auth.getUser();
+        if (userError) throw userError;
+        if (!user) throw new Error('Utente non autenticato');
+
+        const { words, chunks } = chunkText(text);
+        if (!chunks.length) throw new Error('Testo troppo breve per creare chunks');
+
+        const { data: bando, error: bandoError } = await getSupabase()
+          .from('bandi')
+          .insert({
+            user_id: user.id,
+            nome: 'Testo incollato - ' + new Date().toLocaleDateString('it'),
+            num_chunks: chunks.length,
+            num_parole: words.length,
+            tipo: 'testo'
+          })
+          .select()
+          .single();
+
+        if (bandoError) throw bandoError;
+
+        const chunksData = chunks.map((content, index) => ({
+          user_id: user.id,
+          bando_id: bando.id,
+          content,
+          chunk_index: index
+        }));
+
+        const { error: chunksError } = await getSupabase().from('chunks').insert(chunksData);
+        if (chunksError) throw chunksError;
+
+        bumpBandi(1);
+        freeTextInput.value = '';
+        wordCounter.textContent = '0 parole';
+        showToast('Testo salvato: ' + chunks.length + ' chunks ✓', 'success');
+      } catch (error) {
+        showToast(error.message || 'Errore salvataggio testo', 'error');
+      }
+    }
+
+    async function saveMaterie(selected) {
+      try {
+        if (selected.length === 0) {
+          showToast('Seleziona almeno una materia', 'error');
+          return;
+        }
+
+        const { data: { user }, error: userError } = await getSupabase().auth.getUser();
+        if (userError) throw userError;
+        if (!user) throw new Error('Utente non autenticato');
+
+        const { error } = await getSupabase()
+          .from('bandi')
+          .insert({
+            user_id: user.id,
+            nome: selected.join(', '),
+            num_chunks: 0,
+            tipo: 'materie',
+            materie: selected
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        bumpBandi(1);
+        showToast(selected.length + ' materie selezionate ✓', 'success');
+      } catch (error) {
+        showToast(error.message || 'Errore salvataggio materie', 'error');
+      }
+    }
+
+    function switchUploadTab(tab) {
+      uploadTabs.forEach(button => button.classList.toggle('active', button.dataset.uploadTab === tab));
+      Object.entries(uploadPanels).forEach(([key, panel]) => panel.classList.toggle('hidden', key !== tab));
+    }
+
+    function renderMaterieButtons() {
+      materieGrid.innerHTML = MATERIE.map(materia => `
+        <button type="button" class="materia-toggle" data-materia="${escapeHtml(materia)}">${escapeHtml(materia)}</button>
+      `).join('');
+    }
+
+    function updateWordCounter() {
+      const count = freeTextInput.value.trim() ? freeTextInput.value.trim().split(/\s+/).filter(Boolean).length : 0;
+      wordCounter.textContent = count + (count === 1 ? ' parola' : ' parole');
     }
 
     function initUpload() {
+      renderMaterieButtons();
+
+      uploadTabs.forEach(button => {
+        button.addEventListener('click', () => switchUploadTab(button.dataset.uploadTab));
+      });
+
       ['dragenter', 'dragover'].forEach(eventName => {
         uploadDrop.addEventListener(eventName, (event) => {
           event.preventDefault();
           uploadDrop.classList.add('drag-over');
+          uploadDropText.textContent = 'Rilascia qui';
         });
       });
 
@@ -1278,6 +1569,7 @@
         uploadDrop.addEventListener(eventName, (event) => {
           event.preventDefault();
           uploadDrop.classList.remove('drag-over');
+          uploadDropText.textContent = 'Trascina uno o più PDF o clicca per selezionare';
         });
       });
 
@@ -1293,6 +1585,20 @@
         await processFiles(files);
         fileInput.value = '';
       });
+
+      freeTextInput.addEventListener('input', updateWordCounter);
+      saveTextButton.addEventListener('click', () => saveText(freeTextInput.value));
+
+      materieGrid.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-materia]');
+        if (!button) return;
+        const materia = button.dataset.materia;
+        if (selectedMaterie.has(materia)) selectedMaterie.delete(materia);
+        else selectedMaterie.add(materia);
+        button.classList.toggle('active', selectedMaterie.has(materia));
+      });
+
+      saveMaterieButton.addEventListener('click', () => saveMaterie(Array.from(selectedMaterie)));
 
       ctaButton.addEventListener('click', () => showToast('Le simulazioni saranno disponibili a breve', 'warning'));
     }
@@ -1329,5 +1635,5 @@
 
     window.addEventListener('DOMContentLoaded', init);
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a13ef9c20dbdeea7',t:'MTc4Mjg0MTQzMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
