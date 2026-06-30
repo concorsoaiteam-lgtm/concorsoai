@@ -46,6 +46,7 @@
   <!-- Supabase + GSAP -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 
   <style>
     :root {
@@ -437,6 +438,82 @@
       color: var(--accent-2);
     }
 
+    .upload-progress-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .upload-progress-card {
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,.72);
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .upload-progress-card.error {
+      border-color: rgba(220,38,38,.35);
+      background: rgba(254,242,242,.78);
+    }
+
+    .upload-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 9px;
+    }
+
+    .upload-progress-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: .84rem;
+      font-weight: 850;
+      color: var(--text);
+    }
+
+    .upload-progress-status {
+      flex-shrink: 0;
+      font-size: .76rem;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .upload-progress-bar {
+      height: 4px;
+      overflow: hidden;
+      border-radius: 2px;
+      background: rgba(37,99,235,.12);
+    }
+
+    .upload-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 2px;
+      background: #2563EB;
+      transition: width .25s ease;
+    }
+
+    .upload-spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      border: 2px solid rgba(37,99,235,.2);
+      border-top-color: #2563EB;
+      border-radius: 999px;
+      animation: spin .8s linear infinite;
+      vertical-align: -2px;
+    }
+
+    .upload-check { color: var(--success); margin-right: 6px; }
+    .upload-error-icon { color: var(--error); margin-right: 6px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     #onboarding { margin-top: 18px; }
 
     .onboarding-grid {
@@ -697,12 +774,13 @@
         <h2 class="card-title">Carica il tuo bando</h2>
         <p class="mt-2 text-sm font-semibold text-brand-700">PDF fino a 200MB</p>
         <label id="uploadDrop" for="fileInput" class="upload-drop block">
-          <input id="fileInput" type="file" accept="application/pdf,.pdf" class="sr-only" />
+          <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple class="sr-only" />
           <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" />
           </svg>
-          <p class="text-sm font-bold text-brand-700">Trascina un PDF o clicca per selezionare</p>
+          <p class="text-sm font-bold text-brand-700">Trascina uno o più PDF o clicca per selezionare</p>
         </label>
+        <div id="uploadProgressList" class="upload-progress-list"></div>
       </section>
 
       <!-- Onboarding -->
@@ -749,6 +827,12 @@
     const ctaButton = document.getElementById('ctaButton');
     const fileInput = document.getElementById('fileInput');
     const uploadDrop = document.getElementById('uploadDrop');
+    const uploadProgressList = document.getElementById('uploadProgressList');
+    let currentUser = null;
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
 
     const state = {
       simulations: 0,
@@ -1007,6 +1091,181 @@
       });
     }
 
+    const uploadCards = new Map();
+    const MAX_PDF_SIZE = 200 * 1024 * 1024;
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
+    }
+
+    function createUploadCard(file) {
+      const key = file.name;
+      const card = document.createElement('div');
+      card.className = 'upload-progress-card';
+      card.innerHTML = `
+        <div class="upload-progress-head">
+          <p class="upload-progress-name">${escapeHtml(file.name)}</p>
+          <p class="upload-progress-status"><span class="upload-spinner"></span>Caricamento...</p>
+        </div>
+        <div class="upload-progress-bar"><div class="upload-progress-fill"></div></div>
+      `;
+      uploadProgressList.appendChild(card);
+      uploadCards.set(key, card);
+      return card;
+    }
+
+    function updateProgress(fileName, percent, status) {
+      const card = uploadCards.get(fileName);
+      if (!card) return;
+      const fill = card.querySelector('.upload-progress-fill');
+      const statusEl = card.querySelector('.upload-progress-status');
+      fill.style.width = Math.max(0, Math.min(100, percent)) + '%';
+      if (status) statusEl.innerHTML = `<span class="upload-spinner"></span>${escapeHtml(status)}`;
+    }
+
+    function completeProgress(fileName) {
+      const card = uploadCards.get(fileName);
+      if (!card) return;
+      card.querySelector('.upload-progress-fill').style.width = '100%';
+      card.querySelector('.upload-progress-status').innerHTML = '<span class="upload-check">✓</span>Completato';
+    }
+
+    function failProgress(fileName, message) {
+      const card = uploadCards.get(fileName);
+      if (!card) return;
+      card.classList.add('error');
+      card.querySelector('.upload-progress-status').innerHTML = `<span class="upload-error-icon">✗</span>${escapeHtml(message)}`;
+    }
+
+    function validatePdf(file) {
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+      if (!isPdf) throw new Error('Solo file PDF sono accettati');
+      if (file.size > MAX_PDF_SIZE) throw new Error('File troppo grande');
+    }
+
+    async function processFile(file) {
+      createUploadCard(file);
+
+      try {
+        validatePdf(file);
+        if (!currentUser) throw new Error('Utente non autenticato');
+        if (!window.pdfjsLib) throw new Error('PDF.js non disponibile');
+
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = currentUser.id + '/' + Date.now() + '_' + safeName;
+
+        try {
+          updateProgress(file.name, 8, 'Caricamento...');
+          const { error } = await supabaseClient.storage
+            .from('bandi-pdf')
+            .upload(path, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+          if (error) throw error;
+          updateProgress(file.name, 25, 'Estrazione testo...');
+        } catch (error) {
+          throw new Error(error.message || 'Errore Supabase');
+        }
+
+        let pdf;
+        let fullText = '';
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            fullText += content.items.map(item => item.str).join(' ') + '\n';
+            updateProgress(file.name, 25 + (i / pdf.numPages) * 50, 'Estrazione testo...');
+          }
+        } catch (error) {
+          throw new Error(error.message || 'Errore estrazione testo');
+        }
+
+        updateProgress(file.name, 78, 'Salvando...');
+        const words = fullText.split(/\s+/).filter(Boolean);
+        const chunkSize = 500;
+        const overlap = 50;
+        const chunks = [];
+
+        for (let i = 0; i < words.length; i += chunkSize - overlap) {
+          const chunk = words.slice(i, i + chunkSize).join(' ');
+          if (chunk.trim().length > 0) chunks.push(chunk);
+        }
+
+        let bandoId = null;
+        try {
+          const { data: bandoData, error: bandoError } = await supabaseClient
+            .from('bandi')
+            .insert({
+              user_id: currentUser.id,
+              nome: file.name,
+              storage_path: path,
+              num_chunks: chunks.length,
+              num_pagine: pdf.numPages,
+              created_at: new Date().toISOString()
+            })
+            .select('id')
+            .single();
+
+          if (bandoError) throw bandoError;
+          bandoId = bandoData?.id || null;
+        } catch (error) {
+          throw new Error(error.message || 'Errore salvataggio bando');
+        }
+
+        try {
+          const chunksData = chunks.map((content, index) => ({
+            user_id: currentUser.id,
+            bando_id: bandoId,
+            content,
+            chunk_index: index,
+            created_at: new Date().toISOString()
+          }));
+
+          if (chunksData.length) {
+            const { error: chunksError } = await supabaseClient
+              .from('chunks')
+              .insert(chunksData);
+            if (chunksError) throw chunksError;
+          }
+        } catch (error) {
+          throw new Error(error.message || 'Errore salvataggio chunks');
+        }
+
+        completeProgress(file.name);
+        return { ok: true, file };
+      } catch (error) {
+        const message = error.message || 'Errore durante il caricamento';
+        failProgress(file.name, message);
+        return { ok: false, file, error: message };
+      }
+    }
+
+    async function processFiles(fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+
+      const results = await Promise.all(files.map(file => processFile(file)));
+      const successCount = results.filter(result => result.ok).length;
+
+      if (successCount > 0) {
+        state.bandi += successCount;
+        setStat('bandi', state.bandi);
+        showToast(`${successCount} bandi caricati con successo ✓`, 'success');
+      }
+
+      const failed = results.find(result => !result.ok);
+      if (failed && !successCount) showToast(failed.error, 'error');
+
+      setTimeout(() => {
+        uploadProgressList.innerHTML = '';
+        uploadCards.clear();
+      }, 2000);
+    }
+
     function initUpload() {
       ['dragenter', 'dragover'].forEach(eventName => {
         uploadDrop.addEventListener(eventName, (event) => {
@@ -1022,18 +1281,17 @@
         });
       });
 
-      uploadDrop.addEventListener('drop', (event) => {
-        const file = event.dataTransfer.files?.[0];
-        if (!file) return;
-        if (!file.name.toLowerCase().endsWith('.pdf')) return showToast('Carica un file PDF', 'error');
-        showToast('Bando caricato ✓', 'success');
+      uploadDrop.addEventListener('drop', async (event) => {
+        const files = Array.from(event.dataTransfer.files || []);
+        if (!files.length) return;
+        await processFiles(files);
       });
 
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files?.[0];
-        if (!file) return;
-        if (!file.name.toLowerCase().endsWith('.pdf')) return showToast('Carica un file PDF', 'error');
-        showToast('Bando caricato ✓', 'success');
+      fileInput.addEventListener('change', async () => {
+        const files = Array.from(fileInput.files || []);
+        if (!files.length) return;
+        await processFiles(files);
+        fileInput.value = '';
       });
 
       ctaButton.addEventListener('click', () => showToast('Le simulazioni saranno disponibili a breve', 'warning'));
@@ -1050,6 +1308,8 @@
         window.location.href = 'auth.html';
         return;
       }
+
+      currentUser = user;
 
       const name = displayName(user);
       userName.textContent = name;
@@ -1069,5 +1329,5 @@
 
     window.addEventListener('DOMContentLoaded', init);
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a13cfb90ea3798cf',t:'MTc4MjgyMDUzMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
