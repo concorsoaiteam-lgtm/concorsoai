@@ -288,23 +288,47 @@
       margin-bottom: 20px;
     }
 
+    .stat-card { padding: 28px; }
+
     .stat-label {
       font-size: .82rem;
       color: var(--text-muted);
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .stat-number {
-      font-size: 2.25rem;
+      font-size: 2.5rem;
       line-height: 1;
-      font-weight: 800;
-      color: var(--text);
+      font-weight: 900;
+      color: #0B2A4A;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -.05em;
+      letter-spacing: -.055em;
     }
 
-    .stat-empty { color: var(--text-muted); }
+    .stat-empty { color: #A1A1AA; }
+
+    .stat-action {
+      display: inline-flex;
+      margin-top: 12px;
+      font-size: .82rem;
+      font-weight: 900;
+      color: var(--accent-2);
+      text-decoration: none;
+      transition: color .18s ease, transform .18s ease;
+    }
+
+    .stat-action:hover {
+      color: var(--accent-hover);
+      transform: translateX(2px);
+    }
+
+    .stat-note {
+      margin-top: 12px;
+      font-size: .82rem;
+      font-weight: 800;
+      color: #6B7280;
+    }
 
     .cards-grid {
       display: grid;
@@ -614,6 +638,7 @@
           </div>
           <p class="stat-label">Simulazioni</p>
           <p id="statSimulations" class="stat-number skeleton skeleton-number" data-count="0" data-delay="0.05">0</p>
+          <a id="statSimulationsAction" href="#" class="stat-action hidden">Inizia la prima →</a>
         </article>
         <article class="card stat-card">
           <div class="stat-icon">
@@ -621,6 +646,7 @@
           </div>
           <p class="stat-label">Voto medio</p>
           <p id="statAverage" class="stat-number skeleton skeleton-number" data-count="0" data-decimals="1" data-delay="0.1">0</p>
+          <p id="statAverageNote" class="stat-note hidden">Nessun dato ancora</p>
         </article>
         <article class="card stat-card">
           <div class="stat-icon">
@@ -628,6 +654,7 @@
           </div>
           <p class="stat-label">Bandi</p>
           <p id="statBandi" class="stat-number skeleton skeleton-number" data-count="0" data-delay="0.15">0</p>
+          <a id="statBandiAction" href="#" class="stat-action hidden">Carica un PDF ↓</a>
         </article>
         <article class="card stat-card">
           <div class="stat-icon">
@@ -635,7 +662,7 @@
           </div>
           <p class="stat-label">Streak</p>
           <p id="statStreak" class="stat-number skeleton skeleton-number" data-count="0" data-delay="0.2">0</p>
-          <p id="streakLabel" class="mt-2 hidden text-xs font-black text-brand-600">gg 🔥</p>
+          <p id="statStreakNote" class="stat-note hidden">Allenati oggi 💪</p>
         </article>
       </div>
 
@@ -774,18 +801,45 @@
       }, 3000);
     }
 
-    function setStat(el, value, decimals = 0) {
+    function setStat(type, value, decimals = 0) {
+      const elMap = {
+        simulations: document.getElementById('statSimulations'),
+        average: document.getElementById('statAverage'),
+        bandi: document.getElementById('statBandi'),
+        streak: document.getElementById('statStreak')
+      };
+      const el = elMap[type];
       el.classList.remove('skeleton', 'skeleton-number', 'stat-empty');
       const numeric = Number(value || 0);
 
       if (!numeric) {
-        el.textContent = '—';
         el.classList.add('stat-empty');
+        el.removeAttribute('data-count');
+
+        if (type === 'simulations') {
+          el.textContent = '0';
+          document.getElementById('statSimulationsAction').classList.remove('hidden');
+        } else if (type === 'average') {
+          el.textContent = 'N/A';
+          document.getElementById('statAverageNote').classList.remove('hidden');
+        } else if (type === 'bandi') {
+          el.textContent = '0';
+          document.getElementById('statBandiAction').classList.remove('hidden');
+        } else if (type === 'streak') {
+          el.textContent = '0 gg';
+          document.getElementById('statStreakNote').classList.remove('hidden');
+        }
         return;
       }
 
+      if (type === 'simulations') document.getElementById('statSimulationsAction').classList.add('hidden');
+      if (type === 'average') document.getElementById('statAverageNote').classList.add('hidden');
+      if (type === 'bandi') document.getElementById('statBandiAction').classList.add('hidden');
+      if (type === 'streak') document.getElementById('statStreakNote').classList.add('hidden');
+
       el.dataset.count = String(numeric);
       el.textContent = decimals ? numeric.toFixed(decimals) : Math.round(numeric).toString();
+      if (type === 'streak') el.textContent = Math.round(numeric).toString() + ' gg';
     }
 
     function animateCounts() {
@@ -801,10 +855,12 @@
           ease: 'power2.out',
           delay,
           onUpdate: () => {
-            el.textContent = decimals ? obj.value.toFixed(decimals) : Math.round(obj.value).toString();
+            const value = decimals ? obj.value.toFixed(decimals) : Math.round(obj.value).toString();
+            el.textContent = el.id === 'statStreak' ? value + ' gg' : value;
           },
           onComplete: () => {
-            el.textContent = decimals ? target.toFixed(decimals) : Math.round(target).toString();
+            const value = decimals ? target.toFixed(decimals) : Math.round(target).toString();
+            el.textContent = el.id === 'statStreak' ? value + ' gg' : value;
           }
         });
       });
@@ -854,12 +910,10 @@
     }
 
     function renderStats() {
-      setStat(document.getElementById('statSimulations'), state.simulations);
-      setStat(document.getElementById('statAverage'), state.average, 1);
-      setStat(document.getElementById('statBandi'), state.bandi);
-      setStat(document.getElementById('statStreak'), state.streak);
-
-      if (state.streak > 0) document.getElementById('streakLabel').classList.remove('hidden');
+      setStat('simulations', state.simulations);
+      setStat('average', state.average, 1);
+      setStat('bandi', state.bandi);
+      setStat('streak', state.streak);
       if (state.simulations > 0) document.getElementById('onboarding').style.display = 'none';
 
       renderRecent();
@@ -998,5 +1052,5 @@
 
     window.addEventListener('DOMContentLoaded', init);
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a13b525549067578',t:'MTc4MjgwMzExNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a13c4c7c1d50ee61',t:'MTc4MjgxMzM2Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
