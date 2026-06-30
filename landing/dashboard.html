@@ -182,20 +182,20 @@
     }
 
     .card {
-      background: var(--surface);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(214,232,255,.95);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(37,99,235,0.15);
       border-radius: 24px;
       padding: 24px;
-      box-shadow: 0 24px 70px rgba(15,76,129,.10);
-      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background-color .22s ease;
+      box-shadow: 0 4px 24px rgba(37,99,235,0.08);
+      transition: all 0.2s ease;
     }
 
     .card:hover {
       transform: translateY(-3px);
-      border-color: var(--border-hover);
-      box-shadow: 0 32px 90px rgba(15,76,129,.16);
+      border-color: rgba(37,99,235,0.3);
+      box-shadow: 0 8px 32px rgba(37,99,235,0.12);
     }
 
     .btn-primary {
@@ -277,14 +277,14 @@
 
     .stat-icon {
       display: flex;
-      width: 42px;
-      height: 42px;
+      width: 28px;
+      height: 28px;
       align-items: center;
       justify-content: center;
-      border-radius: 16px;
-      background: var(--surface-2);
-      color: var(--accent);
-      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(37,99,235,0.08);
+      color: #2563EB;
+      padding: 8px;
       margin-bottom: 20px;
     }
 
@@ -920,7 +920,15 @@
       renderSubjects();
       animateCounts();
 
-      gsap.from(['#recentList', '#improveList'], { opacity: 0, y: 8, duration: .32, stagger: .05, ease: 'power2.out' });
+      if (window.gsap) {
+        gsap.from(['#recentList', '#improveList'], {
+          y: 8,
+          duration: .32,
+          stagger: .05,
+          ease: 'power2.out',
+          clearProps: 'transform'
+        });
+      }
     }
 
     async function loadDashboardData(userId) {
@@ -935,14 +943,24 @@
     }
 
     function initPageAnimations() {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: .58, opacity: 0, y: 18 } });
+      if (!window.gsap) return;
+
+      const animatedSections = ['.navbar', '.hero', '.cta-wrapper', '.stat-card', '.content-card', '.upload-section', '#onboarding'];
+      gsap.killTweensOf(animatedSections);
+      gsap.set(animatedSections, { opacity: 1, visibility: 'visible' });
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out', duration: .58 },
+        onComplete: () => gsap.set(animatedSections, { opacity: 1, visibility: 'visible', clearProps: 'transform' })
+      });
+
       tl.from('.navbar', { y: -16, duration: .38 })
-        .from('.hero', {}, '-=.28')
+        .from('.hero', { y: 18 }, '-=.28')
         .from('.cta-wrapper', { y: 12 }, '-=.22')
-        .from('.stat-card', { stagger: .055, y: 14 }, '-=.18')
-        .from('.content-card', { stagger: .07, y: 14 }, '-=.12')
-        .from('.upload-section', {}, '-=.08')
-        .from('#onboarding', {}, '-=.08');
+        .from('.stat-card', { y: 14, stagger: .055 }, '-=.18')
+        .from('.content-card', { y: 14, stagger: .07 }, '-=.12')
+        .from('.upload-section', { y: 18 }, '-=.08')
+        .from('#onboarding', { y: 18 }, '-=.08');
     }
 
     function initMagneticButton() {
@@ -1051,5 +1069,5 @@
 
     window.addEventListener('DOMContentLoaded', init);
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a13cfb90ea3798cf',t:'MTc4MjgyMDUzMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
