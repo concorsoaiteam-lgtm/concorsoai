@@ -164,34 +164,37 @@
       padding: 14px 18px;
       background: linear-gradient(135deg, #0F4C81 0%, #2563EB 100%);
       color: #FFFFFF;
-      font-weight: 900;
-      box-shadow: 0 18px 45px rgba(37,99,235,.22);
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.25);
       transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
     }
 
+    .btn-primary .btn-arrow { transition: transform .2s ease; }
+
     .btn-primary:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 24px 60px rgba(37,99,235,.28);
+      box-shadow: 0 8px 28px rgba(37,99,235,.30);
     }
+
+    .btn-primary:hover:not(:disabled) .btn-arrow { transform: translateX(4px); }
 
     .btn-primary:disabled {
       cursor: not-allowed;
-      opacity: .48;
-      box-shadow: none;
+      opacity: .5;
     }
 
     .btn-danger {
       border-radius: 999px;
       padding: 8px 13px;
-      background: rgba(239,68,68,.1);
+      background: transparent;
       color: #B91C1C;
-      border: 1px solid rgba(239,68,68,.22);
+      border: 1px solid rgba(239,68,68,.28);
       font-size: .82rem;
       font-weight: 900;
       transition: all .18s ease;
     }
 
-    .btn-danger:hover { background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.34); }
+    .btn-danger:hover { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.42); }
 
     .loader {
       position: fixed;
@@ -250,21 +253,83 @@
       font-weight: 900;
     }
 
-    .select-input {
-      width: 100%;
-      border: 1px solid rgba(37,99,235,.17);
-      border-radius: 16px;
-      padding: 13px 14px;
-      background: rgba(255,255,255,.9);
-      color: var(--text);
-      font-weight: 750;
-      outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease;
+    .bando-list {
+      display: grid;
+      gap: 10px;
+      max-height: 248px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
-    .select-input:focus {
-      border-color: rgba(37,99,235,.42);
-      box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    .bando-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      border: 1px solid rgba(37,99,235,.15);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,.78);
+      text-align: left;
+      transition: all .2s ease;
+    }
+
+    .bando-card:hover {
+      border-color: rgba(37,99,235,.28);
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(234,244,255,.72));
+    }
+
+    .bando-card.active {
+      border-color: var(--accent-2);
+      background: var(--accent-muted);
+      box-shadow: 0 8px 24px rgba(37,99,235,.10);
+    }
+
+    .bando-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(37,99,235,.08);
+      font-size: 1.15rem;
+    }
+
+    .bando-name {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--text);
+      font-weight: 850;
+    }
+
+    .bando-date {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: .76rem;
+      font-weight: 700;
+    }
+
+    .bando-check {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(37,99,235,.24);
+      color: transparent;
+      font-size: .8rem;
+      font-weight: 950;
+      transition: all .2s ease;
+    }
+
+    .bando-card.active .bando-check {
+      border-color: var(--accent-2);
+      background: var(--accent-2);
+      color: #FFFFFF;
     }
 
     .difficulty-card {
@@ -273,16 +338,22 @@
       text-align: left;
       border: 1px solid rgba(37,99,235,.15);
       border-radius: 18px;
-      padding: 16px;
+      padding: 20px;
       background: rgba(255,255,255,.75);
-      transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+      transition: all .2s ease;
     }
 
-    .difficulty-card:hover { transform: translateY(-1px); border-color: rgba(37,99,235,.26); }
+    .difficulty-card .difficulty-icon { font-size: 24px; line-height: 1; }
+
+    .difficulty-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(37,99,235,.26);
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(234,244,255,.68));
+    }
     .difficulty-card.active {
-      border-color: var(--accent-2);
-      background: var(--accent-muted);
-      box-shadow: inset 0 0 0 1px rgba(37,99,235,.10);
+      border: 2px solid var(--accent-2);
+      background: #FFFFFF;
+      box-shadow: 0 8px 28px rgba(37,99,235,.12);
     }
 
     .recommended-badge {
@@ -300,19 +371,21 @@
     .duration-btn {
       flex: 1;
       border: 1px solid rgba(37,99,235,.16);
-      border-radius: 14px;
-      padding: 11px 12px;
+      border-radius: 10px;
+      padding: 12px 32px;
       background: rgba(255,255,255,.76);
       color: var(--text-secondary);
-      font-weight: 900;
+      font-weight: 500;
       transition: all .2s ease;
     }
+
+    .duration-btn:hover:not(.active) { background: var(--accent-muted); }
 
     .duration-btn.active {
       border-color: var(--accent-2);
       background: var(--accent-2);
       color: #FFFFFF;
-      box-shadow: 0 10px 24px rgba(37,99,235,.18);
+      box-shadow: 0 8px 22px rgba(37,99,235,.20);
     }
 
     .empty-bandi {
@@ -334,10 +407,10 @@
       position: sticky;
       top: 0;
       z-index: 40;
-      border-bottom: 1px solid rgba(37,99,235,.14);
-      background: rgba(255,255,255,.82);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(37,99,235,0.1);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .sim-navbar-inner {
@@ -353,13 +426,15 @@
 
     .bando-title {
       min-width: 0;
+      max-width: 200px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+      justify-self: center;
       text-align: center;
       color: var(--text-secondary);
       font-size: .9rem;
-      font-weight: 900;
+      font-weight: 600;
     }
 
     .info-bar {
@@ -367,7 +442,7 @@
       top: 64px;
       z-index: 35;
       border-bottom: 1px solid rgba(37,99,235,.10);
-      background: rgba(247,251,255,.72);
+      background: transparent;
       backdrop-filter: blur(14px);
     }
 
@@ -378,24 +453,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 0;
       flex-wrap: wrap;
     }
 
     .info-pill {
-      border: 1px solid rgba(37,99,235,.15);
-      border-radius: 8px;
+      border: 1px solid rgba(37,99,235,.12);
+      border-right: 0;
       padding: 8px 16px;
-      background: rgba(255,255,255,.78);
+      background: rgba(255,255,255,0.9);
       color: var(--text-secondary);
-      font-size: .82rem;
-      font-weight: 900;
+      font-size: .875rem;
+      font-weight: 500;
     }
+
+    .info-pill:first-child { border-radius: 8px 0 0 8px; }
+    .info-pill:last-child { border-right: 1px solid rgba(37,99,235,.12); border-radius: 0 8px 8px 0; }
+    #timerDisplay { font-variant-numeric: tabular-nums; transition: color .3s ease, opacity .3s ease; }
 
     .pulse-animation { animation: pulseTimer 1s ease-in-out infinite; }
     @keyframes pulseTimer {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: .7; }
     }
 
     .sim-layout {
@@ -437,48 +516,47 @@
       background: linear-gradient(135deg, #0F4C81, #2563EB);
       color: white;
       font-size: .74rem;
-      font-weight: 950;
+      font-weight: 700;
       box-shadow: 0 12px 26px rgba(37,99,235,.18);
     }
 
     .bubble-wrap { max-width: min(82%, 580px); }
 
     .bubble {
-      border: 1px solid rgba(37,99,235,.14);
-      border-radius: 12px;
+      border: 1px solid rgba(37,99,235,0.1);
+      border-radius: 16px;
       padding: 12px 14px;
-      background: rgba(255,255,255,.86);
+      background: rgba(255,255,255,0.95);
       color: var(--text);
       font-size: .9375rem;
-      line-height: 1.65;
-      box-shadow: 0 4px 18px rgba(37,99,235,.06);
+      line-height: 1.6;
+      box-shadow: 0 2px 12px rgba(37,99,235,0.06);
     }
 
-    .message-row.assistant .bubble { border-top-left-radius: 0; }
+    .message-row.assistant .bubble { border-top-left-radius: 4px; }
     .message-row.user .bubble {
       border-color: rgba(37,99,235,.08);
-      border-top-right-radius: 0;
-      background: var(--accent-2);
+      border-top-right-radius: 4px;
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
       color: #FFFFFF;
-      box-shadow: 0 12px 28px rgba(37,99,235,.18);
+      box-shadow: 0 2px 12px rgba(37,99,235,0.2);
     }
 
     .timestamp {
-      margin-top: 5px;
+      margin-top: 6px;
       color: var(--text-muted);
-      font-size: .72rem;
+      font-size: .75rem;
       font-weight: 700;
     }
 
-    .message-row.user .timestamp { text-align: right; }
+    .message-row.user .timestamp { text-align: right; color: rgba(255,255,255,.7); }
 
     .thinking-bubble {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 7px;
-      min-width: 72px;
+      gap: 6px;
+      padding: 16px 20px;
     }
-
     .thinking-dot {
       width: 8px;
       height: 8px;
@@ -486,17 +564,20 @@
       border-radius: 50%;
       animation: thinkingPulse 1.4s ease-in-out infinite;
     }
+    .thinking-dot:nth-child(1) { animation-delay: 0s; }
     .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
     .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes thinkingPulse {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-      40% { transform: scale(1); opacity: 1; }
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
     }
 
     .feedback-panel {
       align-self: start;
       position: sticky;
       top: 142px;
+      background: rgba(255,255,255,0.95);
+      border-color: rgba(37,99,235,0.1);
     }
 
     .feedback-title {
@@ -513,21 +594,21 @@
       margin-bottom: 8px;
       color: var(--text-secondary);
       font-size: .82rem;
-      font-weight: 850;
+      font-weight: 500;
     }
 
     .feedback-track {
       height: 6px;
-      border-radius: 999px;
+      border-radius: 3px;
       overflow: hidden;
       background: rgba(37,99,235,.10);
     }
 
     .feedback-fill {
       height: 100%;
-      border-radius: 999px;
+      border-radius: 3px;
       width: 50%;
-      background: var(--warning);
+      background: #EAB308;
       transition: width .5s ease, background .5s ease;
     }
 
@@ -553,9 +634,10 @@
       right: 0;
       bottom: 0;
       z-index: 45;
-      border-top: 1px solid rgba(37,99,235,.14);
-      background: rgba(255,255,255,.90);
-      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(37,99,235,0.1);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .input-inner {
@@ -572,9 +654,9 @@
       min-height: 46px;
       max-height: 112px;
       resize: none;
-      border: 1px solid rgba(37,99,235,.16);
-      border-radius: 18px;
-      padding: 12px 14px;
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
       background: rgba(255,255,255,.92);
       color: var(--text);
       font-size: .94rem;
@@ -584,8 +666,9 @@
     }
 
     .answer-input:focus {
-      border-color: rgba(37,99,235,.42);
-      box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+      border-color: rgba(37,99,235,0.5);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
     }
 
     .send-btn {
@@ -595,7 +678,7 @@
       display: grid;
       place-items: center;
       border-radius: 999px;
-      background: var(--accent-2);
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
       color: #FFFFFF;
       font-size: 1.25rem;
       font-weight: 950;
@@ -603,7 +686,8 @@
       transition: transform .18s ease, opacity .18s ease, background .18s ease;
     }
 
-    .send-btn:hover:not(:disabled) { transform: translateY(-1px); background: var(--accent-hover); }
+    .send-btn:hover:not(:disabled) { transform: scale(1.05); }
+    .send-btn:active:not(:disabled) { transform: scale(.95); }
     .send-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
     .modal-backdrop {
@@ -690,16 +774,17 @@
   <main id="configPhase" class="config-shell hidden">
     <section class="card config-card">
       <div class="config-anim">
-        <a href="dashboard.html" class="mb-6 inline-flex text-sm font-black text-brand-600 transition hover:text-brand-800">← Dashboard</a>
-        <h1 class="text-2xl font-semibold tracking-tight text-brand-900">Configura la tua simulazione</h1>
-        <p class="mt-2 text-sm font-semibold leading-6 text-brand-700">Scegli bando, livello e durata. L'AI sarà collegata nel prossimo step.</p>
+        <a href="dashboard.html" class="config-link mb-6 inline-flex text-sm font-black text-brand-600 transition hover:text-brand-800">← Dashboard</a>
+        <div class="config-title">
+          <h1 class="text-2xl font-semibold tracking-tight text-brand-900">Configura la tua simulazione</h1>
+          <p class="mt-2 text-sm font-semibold leading-6 text-brand-700">Scegli bando, livello e durata. L'AI sarà collegata nel prossimo step.</p>
+        </div>
       </div>
 
       <div class="config-anim mt-7">
-        <label for="bandoSelect" class="section-label">1. Seleziona bando</label>
-        <select id="bandoSelect" class="select-input">
-          <option value="">Caricamento bandi...</option>
-        </select>
+        <p class="section-label">1. Seleziona bando</p>
+        <p class="mb-3 text-sm font-semibold text-gray-500">Seleziona uno o più bandi da usare nella simulazione</p>
+        <div id="bandoList" class="bando-list"></div>
         <div id="emptyBandi" class="empty-bandi mt-3 hidden">
           Nessun bando caricato. <a href="dashboard.html" class="font-black text-brand-500 hover:text-brand-700">Torna alla dashboard →</a>
         </div>
@@ -710,7 +795,7 @@
         <div class="grid gap-3">
           <button type="button" class="difficulty-card" data-difficulty="Facile">
             <div class="flex items-start gap-3">
-              <span class="text-xl">🟢</span>
+              <span class="difficulty-icon">🟢</span>
               <div>
                 <h3 class="font-black text-brand-900">Facile</h3>
                 <p class="mt-1 text-sm font-bold text-brand-700">Per prendere ritmo</p>
@@ -723,7 +808,7 @@
           <button type="button" class="difficulty-card active" data-difficulty="Realistico">
             <span class="recommended-badge">Consigliato</span>
             <div class="flex items-start gap-3 pr-20">
-              <span class="text-xl">🟡</span>
+              <span class="difficulty-icon">🟡</span>
               <div>
                 <h3 class="font-black text-brand-900">Realistico</h3>
                 <p class="mt-1 text-sm font-bold text-brand-700">Commissione vera</p>
@@ -735,7 +820,7 @@
 
           <button type="button" class="difficulty-card" data-difficulty="Difficile">
             <div class="flex items-start gap-3">
-              <span class="text-xl">🔴</span>
+              <span class="difficulty-icon">🔴</span>
               <div>
                 <h3 class="font-black text-brand-900">Difficile</h3>
                 <p class="mt-1 text-sm font-bold text-brand-700">Commissione severa</p>
@@ -757,7 +842,7 @@
       </div>
 
       <div class="config-anim mt-7">
-        <button id="startButton" type="button" class="btn-primary w-full" disabled>Inizia Simulazione →</button>
+        <button id="startButton" type="button" class="btn-primary w-full" disabled>Inizia Simulazione <span class="btn-arrow">→</span></button>
       </div>
     </section>
   </main>
@@ -765,7 +850,7 @@
   <main id="simulationPhase" class="sim-phase hidden">
     <nav class="sim-navbar">
       <div class="sim-navbar-inner">
-        <a href="dashboard.html" class="justify-self-start rounded-xl text-lg font-extrabold tracking-tight text-brand-900 outline-none focus-visible:ring-2 focus-visible:ring-brand-500">⚡ Concorso<span class="text-gradient">AI</span></a>
+        <a href="dashboard.html" class="justify-self-start rounded-xl text-lg font-extrabold tracking-tight text-brand-600 outline-none transition hover:text-brand-800 focus-visible:ring-2 focus-visible:ring-brand-500">⚡ ConcorsoAI</a>
         <p id="navBandoName" class="bando-title">Bando selezionato</p>
         <button id="endButton" type="button" class="btn-danger justify-self-end">Termina</button>
       </div>
@@ -798,7 +883,6 @@
           <div class="feedback-label"><span>Contenuto</span><span id="contentScore">5/10</span></div>
           <div class="feedback-track"><div id="contentFill" class="feedback-fill"></div></div>
         </div>
-        <p class="mt-5 text-xs font-bold leading-5 text-gray-500">Valori placeholder: li collegheremo all'AI nel prossimo step.</p>
       </aside>
     </section>
 
@@ -832,7 +916,7 @@
     const configPhase = document.getElementById('configPhase');
     const simulationPhase = document.getElementById('simulationPhase');
     const summaryPhase = document.getElementById('summaryPhase');
-    const bandoSelect = document.getElementById('bandoSelect');
+    const bandoList = document.getElementById('bandoList');
     const emptyBandi = document.getElementById('emptyBandi');
     const startButton = document.getElementById('startButton');
     const difficultyCards = document.querySelectorAll('.difficulty-card');
@@ -855,7 +939,7 @@
     let bandi = [];
     let selectedDifficulty = 'Realistico';
     let selectedDuration = 20;
-    let selectedBando = null;
+    let selectedBandi = [];
     let timeLeft;
     let timerInterval;
     let startedAt = null;
@@ -894,9 +978,9 @@
     }
 
     function feedbackColor(value) {
-      if (value < 5) return 'var(--error)';
-      if (value < 7) return 'var(--warning)';
-      return 'var(--success)';
+      if (value < 5) return '#EF4444';
+      if (value <= 7) return '#EAB308';
+      return '#22C55E';
     }
 
     function updateFeedback() {
@@ -912,7 +996,12 @@
 
     function animateInConfig() {
       if (!window.gsap) return;
-      gsap.from('.config-anim', { opacity: 0, y: 16, duration: .42, stagger: .07, ease: 'power3.out' });
+      gsap.from('.config-link', { opacity: 0, y: 16, duration: 0.5, delay: 0, ease: 'power2.out' });
+      gsap.from('.config-title', { opacity: 0, y: 16, duration: 0.5, delay: 0.1, ease: 'power2.out' });
+      gsap.from('.config-anim:nth-of-type(2)', { opacity: 0, y: 16, duration: 0.5, delay: 0.2, ease: 'power2.out' });
+      gsap.from('.config-anim:nth-of-type(3)', { opacity: 0, y: 16, duration: 0.5, delay: 0.3, ease: 'power2.out' });
+      gsap.from('.config-anim:nth-of-type(4)', { opacity: 0, y: 16, duration: 0.5, delay: 0.4, ease: 'power2.out' });
+      gsap.from('.config-anim:nth-of-type(5)', { opacity: 0, y: 16, duration: 0.5, delay: 0.5, ease: 'power2.out' });
     }
 
     async function loadBandi() {
@@ -923,18 +1012,24 @@
 
       if (error) throw error;
       bandi = data || [];
-      bandoSelect.innerHTML = '';
+      bandoList.innerHTML = '';
 
       if (!bandi.length) {
-        bandoSelect.innerHTML = '<option value="">Nessun bando caricato</option>';
-        bandoSelect.disabled = true;
         emptyBandi.classList.remove('hidden');
         startButton.disabled = true;
         return;
       }
 
-      bandoSelect.disabled = false;
-      bandoSelect.innerHTML = '<option value="">Seleziona un bando</option>' + bandi.map(bando => `<option value="${bando.id}">${bando.filename}</option>`).join('');
+      bandoList.innerHTML = bandi.map(bando => `
+        <button type="button" class="bando-card" data-bando-id="${bando.id}">
+          <span class="bando-icon">📄</span>
+          <span class="min-w-0">
+            <span class="bando-name">${bando.filename}</span>
+            <span class="bando-date">Caricato di recente</span>
+          </span>
+          <span class="bando-check">✓</span>
+        </button>
+      `).join('');
     }
 
     function addMessage(role, text, thinking = false) {
@@ -961,7 +1056,14 @@
 
       chatArea.appendChild(row);
       chatArea.scrollTop = chatArea.scrollHeight;
-      if (window.gsap) gsap.from(row, { opacity: 0, y: 12, duration: .3, ease: 'power2.out' });
+      if (window.gsap) {
+        gsap.from(row, {
+          opacity: 0,
+          y: 12,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      }
       return row;
     }
 
@@ -996,13 +1098,12 @@
     }
 
     function startSimulation() {
-      selectedBando = bandi.find(bando => bando.id === bandoSelect.value);
-      if (!selectedBando) return;
+      if (!selectedBandi.length) return;
 
       totalQuestions = selectedDuration === 10 ? 5 : selectedDuration === 20 ? 8 : 12;
       questionIndex = 1;
       startedAt = Date.now();
-      navBandoName.textContent = selectedBando.filename;
+      navBandoName.textContent = selectedBandi.length > 1 ? selectedBandi.length + ' bandi selezionati' : selectedBandi[0].filename;
       difficultyDisplay.textContent = selectedDifficulty;
       updateQuestionCounter();
       updateFeedback();
@@ -1010,24 +1111,37 @@
       if (window.gsap) {
         gsap.to(configPhase, {
           opacity: 0,
-          y: -10,
-          duration: .22,
-          ease: 'power2.out',
-          onComplete: showSimulationPhase
+          y: -20,
+          duration: 0.3,
+          ease: "power2.in",
+          onComplete: () => {
+            configPhase.style.display = 'none';
+            simulationPhase.style.display = 'block';
+            simulationPhase.classList.remove('hidden');
+            gsap.from(simulationPhase, {
+              opacity: 0,
+              duration: 0.4,
+              ease: "power2.out"
+            });
+            startSimulationUI();
+          }
         });
       } else {
         showSimulationPhase();
       }
     }
 
-    function showSimulationPhase() {
-      configPhase.classList.add('hidden');
-      simulationPhase.classList.remove('hidden');
-      if (window.gsap) gsap.from(simulationPhase, { opacity: 0, y: 12, duration: .35, ease: 'power3.out' });
+    function startSimulationUI() {
       startTimer(selectedDuration);
       addMessage('assistant', 'Buongiorno, iniziamo la simulazione orale. Risponda come se fosse davanti alla commissione: tono chiaro, struttura ordinata, esempi quando servono.');
       addMessage('assistant', placeholderQuestions[0]);
       addMessage('user', 'Va bene, sono pronto. Inizio presentando il quadro generale e poi entro nei punti principali.');
+    }
+
+    function showSimulationPhase() {
+      configPhase.classList.add('hidden');
+      simulationPhase.classList.remove('hidden');
+      startSimulationUI();
     }
 
     async function sendAnswer() {
@@ -1072,11 +1186,11 @@
 
     async function saveSimulationResult() {
       try {
-        if (!selectedBando) return;
+        if (!selectedBandi.length) return;
         const usedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
         await supabaseClient.from('simulazioni').insert({
           user_id: currentUser.id,
-          bando_id: selectedBando.id,
+          bando_id: selectedBandi[0].id,
           difficulty: selectedDifficulty,
           duration_minutes: selectedDuration,
           questions_total: questionIndex,
@@ -1119,8 +1233,16 @@
     }
 
     function initEvents() {
-      bandoSelect.addEventListener('change', () => {
-        startButton.disabled = !bandoSelect.value;
+      bandoList.addEventListener('click', (event) => {
+        const card = event.target.closest('[data-bando-id]');
+        if (!card) return;
+        const id = card.dataset.bandoId;
+        const bando = bandi.find(item => String(item.id) === String(id));
+        if (!bando) return;
+        const exists = selectedBandi.some(item => String(item.id) === String(id));
+        selectedBandi = exists ? selectedBandi.filter(item => String(item.id) !== String(id)) : [...selectedBandi, bando];
+        card.classList.toggle('active', !exists);
+        startButton.disabled = selectedBandi.length === 0;
       });
 
       difficultyCards.forEach(card => {
