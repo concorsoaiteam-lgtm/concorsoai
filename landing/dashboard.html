@@ -1432,13 +1432,9 @@
         const batchSize = 50;
         for (let i = 0; i < chunks.length; i += batchSize) {
           const batch = chunks.slice(i, i + batchSize).map((content, idx) => ({
-            user_id: user.id,
-            content,
-            metadata: {
-              bando_id: bando.id,
-              bando_filename: file.name,
-              chunk_index: i + idx
-            }
+            bando_id: bando.id,
+            chunk_index: i + idx,
+            content: content
           }));
 
           const { error } = await getSupabase().from('chunks').insert(batch);
@@ -1488,13 +1484,9 @@
         if (bandoError) throw bandoError;
 
         const chunksData = chunks.map((content, index) => ({
-          user_id: user.id,
-          content,
-          metadata: {
-            bando_id: bando.id,
-            bando_filename: 'Testo incollato',
-            chunk_index: index
-          }
+          bando_id: bando.id,
+          chunk_index: index,
+          content: content
         }));
 
         const { error: chunksError } = await getSupabase().from('chunks').insert(chunksData);
