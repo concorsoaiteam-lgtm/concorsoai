@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulazione — ConcorsoAI</title>
+  <meta name="description" content="Simulazione orale ConcorsoAI: esercitati con un commissario virtuale e ricevi feedback live." />
+  <meta name="theme-color" content="#F7FBFF" />
+
+  <!-- Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#F7FBFF',
+              100: '#EAF4FF',
+              200: '#D6E8FF',
+              300: '#A9CDF8',
+              400: '#5EA0E8',
+              500: '#2563EB',
+              600: '#0F4C81',
+              700: '#0B3A63',
+              800: '#0B2A4A',
+              900: '#071D33'
+            }
+          },
+          boxShadow: {
+            card: '0 24px 70px rgba(15,76,129,.12)',
+            cardHover: '0 30px 90px rgba(15,76,129,.18)',
+            glowBlue: '0 18px 45px rgba(37,99,235,.22)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Supabase + GSAP -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7FBFF;
+      --surface: rgba(255,255,255,.85);
+      --surface-solid: #FFFFFF;
+      --surface-2: rgba(234,244,255,.78);
+      --text: #071D33;
+      --text-secondary: #0B3A63;
+      --text-muted: #6B7280;
+      --accent: #0F4C81;
+      --accent-2: #2563EB;
+      --accent-hover: #1D4ED8;
+      --accent-muted: rgba(37,99,235,.08);
+      --border: rgba(37,99,235,.15);
+      --border-hover: rgba(37,99,235,.3);
+      --success: #16A34A;
+      --warning: #D97706;
+      --error: #EF4444;
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% -8%, rgba(37,99,235,.13), transparent 34rem),
+        radial-gradient(circle at 90% 4%, rgba(94,160,232,.12), transparent 30rem),
+        linear-gradient(180deg, #F7FBFF 0%, #FFFFFF 32%, #F7FBFF 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(15,76,129,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,76,129,.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 50% 18%, black 0%, transparent 72%);
+    }
+
+    .orb {
+      position: fixed;
+      z-index: -2;
+      pointer-events: none;
+      border-radius: 999px;
+      filter: blur(18px);
+      opacity: .44;
+    }
+
+    .orb-1 {
+      top: 7rem;
+      left: -7rem;
+      width: 18rem;
+      height: 18rem;
+      background: rgba(37,99,235,.13);
+    }
+
+    .orb-2 {
+      right: -8rem;
+      top: 18rem;
+      width: 21rem;
+      height: 21rem;
+      background: rgba(94,160,232,.13);
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .025;
+      mix-blend-mode: multiply;
+    }
+
+    .text-gradient {
+      background: linear-gradient(135deg, #0B2A4A 0%, #0F4C81 48%, #2563EB 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(37,99,235,0.15);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 4px 24px rgba(37,99,235,0.08);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(37,99,235,0.3);
+      box-shadow: 0 8px 32px rgba(37,99,235,0.12);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #0F4C81 0%, #2563EB 100%);
+      color: #FFFFFF;
+      font-weight: 900;
+      box-shadow: 0 18px 45px rgba(37,99,235,.22);
+      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 60px rgba(37,99,235,.28);
+    }
+
+    .btn-primary:disabled {
+      cursor: not-allowed;
+      opacity: .48;
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      border-radius: 999px;
+      padding: 8px 13px;
+      background: rgba(239,68,68,.1);
+      color: #B91C1C;
+      border: 1px solid rgba(239,68,68,.22);
+      font-size: .82rem;
+      font-weight: 900;
+      transition: all .18s ease;
+    }
+
+    .btn-danger:hover { background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.34); }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      background: rgba(247,251,255,.84);
+      backdrop-filter: blur(10px);
+    }
+
+    .loader-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: #FFFFFF;
+      color: var(--text-secondary);
+      font-size: .9rem;
+      font-weight: 850;
+      box-shadow: 0 14px 40px rgba(15,76,129,.10);
+    }
+
+    .loader-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent-2);
+      animation: loaderPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes loaderPulse {
+      0%, 100% { opacity: .35; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.5); }
+    }
+
+    .config-shell {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .config-card {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .section-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--text-secondary);
+      font-size: .84rem;
+      font-weight: 900;
+    }
+
+    .select-input {
+      width: 100%;
+      border: 1px solid rgba(37,99,235,.17);
+      border-radius: 16px;
+      padding: 13px 14px;
+      background: rgba(255,255,255,.9);
+      color: var(--text);
+      font-weight: 750;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .select-input:focus {
+      border-color: rgba(37,99,235,.42);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    }
+
+    .difficulty-card {
+      position: relative;
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(37,99,235,.15);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,.75);
+      transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+
+    .difficulty-card:hover { transform: translateY(-1px); border-color: rgba(37,99,235,.26); }
+    .difficulty-card.active {
+      border-color: var(--accent-2);
+      background: var(--accent-muted);
+      box-shadow: inset 0 0 0 1px rgba(37,99,235,.10);
+    }
+
+    .recommended-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(37,99,235,.1);
+      color: var(--accent-2);
+      font-size: .68rem;
+      font-weight: 950;
+    }
+
+    .duration-btn {
+      flex: 1;
+      border: 1px solid rgba(37,99,235,.16);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.76);
+      color: var(--text-secondary);
+      font-weight: 900;
+      transition: all .2s ease;
+    }
+
+    .duration-btn.active {
+      border-color: var(--accent-2);
+      background: var(--accent-2);
+      color: #FFFFFF;
+      box-shadow: 0 10px 24px rgba(37,99,235,.18);
+    }
+
+    .empty-bandi {
+      border: 1px solid rgba(37,99,235,.14);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(234,244,255,.62);
+      color: var(--text-muted);
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .sim-phase {
+      min-height: 100vh;
+      padding-bottom: 112px;
+    }
+
+    .sim-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid rgba(37,99,235,.14);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .sim-navbar-inner {
+      height: 64px;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr minmax(0, 1.5fr) 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bando-title {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: .9rem;
+      font-weight: 900;
+    }
+
+    .info-bar {
+      position: sticky;
+      top: 64px;
+      z-index: 35;
+      border-bottom: 1px solid rgba(37,99,235,.10);
+      background: rgba(247,251,255,.72);
+      backdrop-filter: blur(14px);
+    }
+
+    .info-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .info-pill {
+      border: 1px solid rgba(37,99,235,.15);
+      border-radius: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,.78);
+      color: var(--text-secondary);
+      font-size: .82rem;
+      font-weight: 900;
+    }
+
+    .pulse-animation { animation: pulseTimer 1s ease-in-out infinite; }
+    @keyframes pulseTimer {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .sim-layout {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 16px 0;
+      display: grid;
+      grid-template-columns: minmax(0, 720px) 280px;
+      justify-content: center;
+      gap: 22px;
+    }
+
+    .chat-area {
+      height: calc(100vh - 64px - 58px - 116px);
+      min-height: 360px;
+      overflow-y: auto;
+      padding: 8px 4px 24px;
+      scroll-behavior: smooth;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 10px;
+      margin: 14px 0;
+      align-items: flex-start;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .avatar {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      color: white;
+      font-size: .74rem;
+      font-weight: 950;
+      box-shadow: 0 12px 26px rgba(37,99,235,.18);
+    }
+
+    .bubble-wrap { max-width: min(82%, 580px); }
+
+    .bubble {
+      border: 1px solid rgba(37,99,235,.14);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.86);
+      color: var(--text);
+      font-size: .9375rem;
+      line-height: 1.65;
+      box-shadow: 0 4px 18px rgba(37,99,235,.06);
+    }
+
+    .message-row.assistant .bubble { border-top-left-radius: 0; }
+    .message-row.user .bubble {
+      border-color: rgba(37,99,235,.08);
+      border-top-right-radius: 0;
+      background: var(--accent-2);
+      color: #FFFFFF;
+      box-shadow: 0 12px 28px rgba(37,99,235,.18);
+    }
+
+    .timestamp {
+      margin-top: 5px;
+      color: var(--text-muted);
+      font-size: .72rem;
+      font-weight: 700;
+    }
+
+    .message-row.user .timestamp { text-align: right; }
+
+    .thinking-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 72px;
+    }
+
+    .thinking-dot {
+      width: 8px;
+      height: 8px;
+      background: #A1A1AA;
+      border-radius: 50%;
+      animation: thinkingPulse 1.4s ease-in-out infinite;
+    }
+    .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes thinkingPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .feedback-panel {
+      align-self: start;
+      position: sticky;
+      top: 142px;
+    }
+
+    .feedback-title {
+      color: var(--text);
+      font-weight: 950;
+      letter-spacing: -.02em;
+    }
+
+    .feedback-row { margin-top: 16px; }
+    .feedback-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: .82rem;
+      font-weight: 850;
+    }
+
+    .feedback-track {
+      height: 6px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(37,99,235,.10);
+    }
+
+    .feedback-fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 50%;
+      background: var(--warning);
+      transition: width .5s ease, background .5s ease;
+    }
+
+    .mobile-feedback-toggle {
+      display: none;
+      position: fixed;
+      right: 16px;
+      bottom: 96px;
+      z-index: 34;
+      border-radius: 999px;
+      padding: 10px 13px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: .82rem;
+      font-weight: 900;
+      box-shadow: 0 14px 34px rgba(37,99,235,.13);
+    }
+
+    .input-shell {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 45;
+      border-top: 1px solid rgba(37,99,235,.14);
+      background: rgba(255,255,255,.90);
+      backdrop-filter: blur(16px);
+    }
+
+    .input-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .answer-input {
+      flex: 1;
+      min-height: 46px;
+      max-height: 112px;
+      resize: none;
+      border: 1px solid rgba(37,99,235,.16);
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.92);
+      color: var(--text);
+      font-size: .94rem;
+      line-height: 1.45;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .answer-input:focus {
+      border-color: rgba(37,99,235,.42);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    }
+
+    .send-btn {
+      flex: 0 0 auto;
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--accent-2);
+      color: #FFFFFF;
+      font-size: 1.25rem;
+      font-weight: 950;
+      box-shadow: 0 12px 30px rgba(37,99,235,.22);
+      transition: transform .18s ease, opacity .18s ease, background .18s ease;
+    }
+
+    .send-btn:hover:not(:disabled) { transform: translateY(-1px); background: var(--accent-hover); }
+    .send-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(7,29,51,.28);
+      backdrop-filter: blur(8px);
+    }
+
+    .summary-shell {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 100;
+      max-width: 360px;
+      border: 1px solid rgba(37,99,235,.16);
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: #FFFFFF;
+      color: var(--text-secondary);
+      font-size: .88rem;
+      font-weight: 850;
+      box-shadow: 0 18px 44px rgba(15,76,129,.14);
+    }
+
+    .toast-error { border-color: rgba(239,68,68,.2); color: #B91C1C; }
+
+    @media (max-width: 1024px) {
+      .sim-layout {
+        grid-template-columns: minmax(0, 720px);
+        max-width: 760px;
+      }
+
+      .feedback-panel {
+        display: none;
+        position: fixed;
+        z-index: 55;
+        top: auto;
+        left: 16px;
+        right: 16px;
+        bottom: 156px;
+      }
+
+      .feedback-panel.open { display: block; }
+      .mobile-feedback-toggle { display: inline-flex; }
+    }
+
+    @media (max-width: 640px) {
+      .sim-navbar-inner {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        height: 58px;
+      }
+      .info-bar { top: 58px; }
+      .info-pill { padding: 7px 10px; font-size: .76rem; }
+      .chat-area { height: calc(100vh - 58px - 90px - 106px); }
+      .bubble-wrap { max-width: 88%; }
+      .config-card { padding: 20px; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <svg class="noise" width="100%" height="100%" aria-hidden="true">
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4" stitchTiles="stitch" /></filter>
+    <rect width="100%" height="100%" filter="url(#noise)" />
+  </svg>
+
+  <div id="loader" class="loader" role="status" aria-live="polite">
+    <div class="loader-card"><span class="loader-dot"></span><span>Verifica sessione</span></div>
+  </div>
+
+  <main id="configPhase" class="config-shell hidden">
+    <section class="card config-card">
+      <div class="config-anim">
+        <a href="dashboard.html" class="mb-6 inline-flex text-sm font-black text-brand-600 transition hover:text-brand-800">← Dashboard</a>
+        <h1 class="text-2xl font-semibold tracking-tight text-brand-900">Configura la tua simulazione</h1>
+        <p class="mt-2 text-sm font-semibold leading-6 text-brand-700">Scegli bando, livello e durata. L'AI sarà collegata nel prossimo step.</p>
+      </div>
+
+      <div class="config-anim mt-7">
+        <label for="bandoSelect" class="section-label">1. Seleziona bando</label>
+        <select id="bandoSelect" class="select-input">
+          <option value="">Caricamento bandi...</option>
+        </select>
+        <div id="emptyBandi" class="empty-bandi mt-3 hidden">
+          Nessun bando caricato. <a href="dashboard.html" class="font-black text-brand-500 hover:text-brand-700">Torna alla dashboard →</a>
+        </div>
+      </div>
+
+      <div class="config-anim mt-7">
+        <p class="section-label">2. Difficoltà</p>
+        <div class="grid gap-3">
+          <button type="button" class="difficulty-card" data-difficulty="Facile">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">🟢</span>
+              <div>
+                <h3 class="font-black text-brand-900">Facile</h3>
+                <p class="mt-1 text-sm font-bold text-brand-700">Per prendere ritmo</p>
+                <p class="mt-2 text-sm leading-6 text-gray-600"><strong>Pro:</strong> Domande lineari, meno pressione, ottimo per iniziare</p>
+                <p class="mt-1 text-sm leading-6 text-gray-500"><strong>Contro:</strong> Può dare falsa sicurezza</p>
+              </div>
+            </div>
+          </button>
+
+          <button type="button" class="difficulty-card active" data-difficulty="Realistico">
+            <span class="recommended-badge">Consigliato</span>
+            <div class="flex items-start gap-3 pr-20">
+              <span class="text-xl">🟡</span>
+              <div>
+                <h3 class="font-black text-brand-900">Realistico</h3>
+                <p class="mt-1 text-sm font-bold text-brand-700">Commissione vera</p>
+                <p class="mt-2 text-sm leading-6 text-gray-600"><strong>Pro:</strong> Il miglior indicatore se sei pronto davvero</p>
+                <p class="mt-1 text-sm leading-6 text-gray-500"><strong>Contro:</strong> Ti mette davanti ai buchi reali</p>
+              </div>
+            </div>
+          </button>
+
+          <button type="button" class="difficulty-card" data-difficulty="Difficile">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">🔴</span>
+              <div>
+                <h3 class="font-black text-brand-900">Difficile</h3>
+                <p class="mt-1 text-sm font-bold text-brand-700">Commissione severa</p>
+                <p class="mt-2 text-sm leading-6 text-gray-600"><strong>Pro:</strong> Scopre subito le debolezze, ti alza il livello</p>
+                <p class="mt-1 text-sm leading-6 text-gray-500"><strong>Contro:</strong> Può demoralizzare se usato troppo presto</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="config-anim mt-7">
+        <p class="section-label">3. Durata</p>
+        <div class="flex gap-2">
+          <button type="button" class="duration-btn" data-duration="10">10 min</button>
+          <button type="button" class="duration-btn active" data-duration="20">20 min</button>
+          <button type="button" class="duration-btn" data-duration="30">30 min</button>
+        </div>
+      </div>
+
+      <div class="config-anim mt-7">
+        <button id="startButton" type="button" class="btn-primary w-full" disabled>Inizia Simulazione →</button>
+      </div>
+    </section>
+  </main>
+
+  <main id="simulationPhase" class="sim-phase hidden">
+    <nav class="sim-navbar">
+      <div class="sim-navbar-inner">
+        <a href="dashboard.html" class="justify-self-start rounded-xl text-lg font-extrabold tracking-tight text-brand-900 outline-none focus-visible:ring-2 focus-visible:ring-brand-500">⚡ Concorso<span class="text-gradient">AI</span></a>
+        <p id="navBandoName" class="bando-title">Bando selezionato</p>
+        <button id="endButton" type="button" class="btn-danger justify-self-end">Termina</button>
+      </div>
+    </nav>
+
+    <section class="info-bar">
+      <div class="info-inner">
+        <div class="info-pill">Domanda <span id="questionCounter">1/8</span></div>
+        <div class="info-pill">Timer <span id="timerDisplay">20:00</span></div>
+        <div class="info-pill">Difficoltà: <span id="difficultyDisplay">Realistico</span></div>
+      </div>
+    </section>
+
+    <button id="feedbackToggle" type="button" class="mobile-feedback-toggle">📊 Feedback</button>
+
+    <section class="sim-layout">
+      <div id="chatArea" class="chat-area" aria-live="polite"></div>
+
+      <aside id="feedbackPanel" class="feedback-panel card">
+        <h2 class="feedback-title">📊 Feedback live</h2>
+        <div class="feedback-row">
+          <div class="feedback-label"><span>Chiarezza</span><span id="clarityScore">5/10</span></div>
+          <div class="feedback-track"><div id="clarityFill" class="feedback-fill"></div></div>
+        </div>
+        <div class="feedback-row">
+          <div class="feedback-label"><span>Struttura</span><span id="structureScore">5/10</span></div>
+          <div class="feedback-track"><div id="structureFill" class="feedback-fill"></div></div>
+        </div>
+        <div class="feedback-row">
+          <div class="feedback-label"><span>Contenuto</span><span id="contentScore">5/10</span></div>
+          <div class="feedback-track"><div id="contentFill" class="feedback-fill"></div></div>
+        </div>
+        <p class="mt-5 text-xs font-bold leading-5 text-gray-500">Valori placeholder: li collegheremo all'AI nel prossimo step.</p>
+      </aside>
+    </section>
+
+    <section class="input-shell">
+      <div class="input-inner">
+        <textarea id="answerInput" class="answer-input" rows="1" placeholder="Scrivi la tua risposta..."></textarea>
+        <button id="sendButton" class="send-btn" type="button" aria-label="Invia risposta">↑</button>
+      </div>
+    </section>
+  </main>
+
+  <main id="summaryPhase" class="summary-shell hidden"></main>
+
+  <div id="confirmModal" class="modal-backdrop hidden">
+    <section class="card max-w-md w-full">
+      <h2 class="text-xl font-black tracking-tight text-brand-900">Vuoi terminare la simulazione?</h2>
+      <p class="mt-2 text-sm font-semibold leading-6 text-brand-700">Il riepilogo verrà generato con i dati raccolti finora.</p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="cancelEndButton" type="button" class="rounded-full border border-brand-200 bg-white px-4 py-2 text-sm font-black text-brand-700 transition hover:bg-brand-50">Continua</button>
+        <button id="confirmEndButton" type="button" class="btn-danger">Termina</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const SUPABASE_URL = ['https://','xhifnparcouxsypkjcmn','.supabase.co'].join('');
+    const SUPABASE_KEY = ['sb_publishable_','dVYESGcHAV13d5aI1uC7wQ','_pQ0r1qT2'].join('');
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+    const loader = document.getElementById('loader');
+    const configPhase = document.getElementById('configPhase');
+    const simulationPhase = document.getElementById('simulationPhase');
+    const summaryPhase = document.getElementById('summaryPhase');
+    const bandoSelect = document.getElementById('bandoSelect');
+    const emptyBandi = document.getElementById('emptyBandi');
+    const startButton = document.getElementById('startButton');
+    const difficultyCards = document.querySelectorAll('.difficulty-card');
+    const durationButtons = document.querySelectorAll('.duration-btn');
+    const navBandoName = document.getElementById('navBandoName');
+    const difficultyDisplay = document.getElementById('difficultyDisplay');
+    const questionCounter = document.getElementById('questionCounter');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const chatArea = document.getElementById('chatArea');
+    const answerInput = document.getElementById('answerInput');
+    const sendButton = document.getElementById('sendButton');
+    const endButton = document.getElementById('endButton');
+    const confirmModal = document.getElementById('confirmModal');
+    const cancelEndButton = document.getElementById('cancelEndButton');
+    const confirmEndButton = document.getElementById('confirmEndButton');
+    const feedbackToggle = document.getElementById('feedbackToggle');
+    const feedbackPanel = document.getElementById('feedbackPanel');
+
+    let currentUser = null;
+    let bandi = [];
+    let selectedDifficulty = 'Realistico';
+    let selectedDuration = 20;
+    let selectedBando = null;
+    let timeLeft;
+    let timerInterval;
+    let startedAt = null;
+    let isThinking = false;
+    let questionIndex = 1;
+    let totalQuestions = 8;
+    let feedback = { clarity: 5, structure: 5, content: 5 };
+
+    const placeholderQuestions = [
+      'Bene. Mi esponga in modo sintetico i punti principali del bando che ha caricato e perché sono rilevanti per la preparazione.',
+      'Ora provi a collegare questo argomento a un principio generale della materia. Voglio una risposta ordinata: definizione, esempio, conseguenza pratica.',
+      'Le faccio una domanda più concreta: come applicherebbe questo concetto in un caso operativo dentro una pubblica amministrazione?',
+      'Ultima precisazione: quali errori commetterebbe un candidato impreparato su questo tema?'
+    ];
+
+    function showToast(msg, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type === 'error' ? 'toast-error' : '');
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      if (window.gsap) gsap.fromTo(toast, { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: .25, ease: 'power2.out' });
+      setTimeout(() => {
+        if (window.gsap) gsap.to(toast, { x: 80, opacity: 0, duration: .22, onComplete: () => toast.remove() });
+        else toast.remove();
+      }, 3200);
+    }
+
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = seconds % 60;
+      return String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    function nowLabel() {
+      return new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function feedbackColor(value) {
+      if (value < 5) return 'var(--error)';
+      if (value < 7) return 'var(--warning)';
+      return 'var(--success)';
+    }
+
+    function updateFeedback() {
+      ['clarity', 'structure', 'content'].forEach(key => {
+        const value = feedback[key];
+        const fill = document.getElementById(key + 'Fill');
+        const score = document.getElementById(key + 'Score');
+        fill.style.width = (value * 10) + '%';
+        fill.style.background = feedbackColor(value);
+        score.textContent = value + '/10';
+      });
+    }
+
+    function animateInConfig() {
+      if (!window.gsap) return;
+      gsap.from('.config-anim', { opacity: 0, y: 16, duration: .42, stagger: .07, ease: 'power3.out' });
+    }
+
+    async function loadBandi() {
+      const { data, error } = await supabaseClient
+        .from('bandi')
+        .select('id, filename')
+        .eq('user_id', currentUser.id);
+
+      if (error) throw error;
+      bandi = data || [];
+      bandoSelect.innerHTML = '';
+
+      if (!bandi.length) {
+        bandoSelect.innerHTML = '<option value="">Nessun bando caricato</option>';
+        bandoSelect.disabled = true;
+        emptyBandi.classList.remove('hidden');
+        startButton.disabled = true;
+        return;
+      }
+
+      bandoSelect.disabled = false;
+      bandoSelect.innerHTML = '<option value="">Seleziona un bando</option>' + bandi.map(bando => `<option value="${bando.id}">${bando.filename}</option>`).join('');
+    }
+
+    function addMessage(role, text, thinking = false) {
+      const row = document.createElement('div');
+      row.className = 'message-row ' + (role === 'user' ? 'user' : 'assistant');
+
+      if (role === 'assistant') {
+        row.innerHTML = `
+          <div class="avatar">CA</div>
+          <div class="bubble-wrap">
+            <div class="bubble">${thinking ? '<div class="thinking-bubble"><span class="thinking-dot"></span><span class="thinking-dot"></span><span class="thinking-dot"></span></div>' : text}</div>
+            <div class="timestamp">${nowLabel()}</div>
+          </div>
+        `;
+      } else {
+        row.innerHTML = `
+          <div class="bubble-wrap">
+            <div class="bubble"></div>
+            <div class="timestamp">${nowLabel()}</div>
+          </div>
+        `;
+        row.querySelector('.bubble').textContent = text;
+      }
+
+      chatArea.appendChild(row);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      if (window.gsap) gsap.from(row, { opacity: 0, y: 12, duration: .3, ease: 'power2.out' });
+      return row;
+    }
+
+    function removeThinking(row) {
+      if (row) row.remove();
+    }
+
+    function updateQuestionCounter() {
+      questionCounter.textContent = questionIndex + '/' + totalQuestions;
+    }
+
+    function startTimer(minutes) {
+      timeLeft = minutes * 60;
+      timerDisplay.textContent = formatTime(timeLeft);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        timerDisplay.textContent = String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+
+        if(timeLeft <= 120) {
+          timerDisplay.style.color = 'var(--error, #EF4444)';
+        }
+        if(timeLeft <= 60) {
+          timerDisplay.classList.add('pulse-animation');
+        }
+        if(timeLeft <= 0) {
+          clearInterval(timerInterval);
+          requestEndSimulation();
+        }
+      }, 1000);
+    }
+
+    function startSimulation() {
+      selectedBando = bandi.find(bando => bando.id === bandoSelect.value);
+      if (!selectedBando) return;
+
+      totalQuestions = selectedDuration === 10 ? 5 : selectedDuration === 20 ? 8 : 12;
+      questionIndex = 1;
+      startedAt = Date.now();
+      navBandoName.textContent = selectedBando.filename;
+      difficultyDisplay.textContent = selectedDifficulty;
+      updateQuestionCounter();
+      updateFeedback();
+
+      if (window.gsap) {
+        gsap.to(configPhase, {
+          opacity: 0,
+          y: -10,
+          duration: .22,
+          ease: 'power2.out',
+          onComplete: showSimulationPhase
+        });
+      } else {
+        showSimulationPhase();
+      }
+    }
+
+    function showSimulationPhase() {
+      configPhase.classList.add('hidden');
+      simulationPhase.classList.remove('hidden');
+      if (window.gsap) gsap.from(simulationPhase, { opacity: 0, y: 12, duration: .35, ease: 'power3.out' });
+      startTimer(selectedDuration);
+      addMessage('assistant', 'Buongiorno, iniziamo la simulazione orale. Risponda come se fosse davanti alla commissione: tono chiaro, struttura ordinata, esempi quando servono.');
+      addMessage('assistant', placeholderQuestions[0]);
+      addMessage('user', 'Va bene, sono pronto. Inizio presentando il quadro generale e poi entro nei punti principali.');
+    }
+
+    async function sendAnswer() {
+      const text = answerInput.value.trim();
+      if (!text || isThinking) return;
+
+      addMessage('user', text);
+      answerInput.value = '';
+      autoResizeInput();
+      isThinking = true;
+      answerInput.disabled = true;
+      sendButton.disabled = true;
+      const thinkingRow = addMessage('assistant', '', true);
+
+      feedback.clarity = Math.min(10, Math.max(4, feedback.clarity + (Math.random() > .45 ? 1 : 0)));
+      feedback.structure = Math.min(10, Math.max(4, feedback.structure + (Math.random() > .55 ? 1 : 0)));
+      feedback.content = Math.min(10, Math.max(4, feedback.content + (Math.random() > .5 ? 1 : 0)));
+      updateFeedback();
+
+      setTimeout(() => {
+        removeThinking(thinkingRow);
+        questionIndex = Math.min(totalQuestions, questionIndex + 1);
+        updateQuestionCounter();
+        const nextQuestion = placeholderQuestions[(questionIndex - 1) % placeholderQuestions.length];
+        addMessage('assistant', nextQuestion);
+        isThinking = false;
+        answerInput.disabled = false;
+        sendButton.disabled = false;
+        answerInput.focus();
+      }, 1100);
+    }
+
+    function autoResizeInput() {
+      answerInput.style.height = 'auto';
+      answerInput.style.height = Math.min(answerInput.scrollHeight, 112) + 'px';
+    }
+
+    function requestEndSimulation() {
+      confirmModal.classList.remove('hidden');
+      if (window.gsap) gsap.from(confirmModal.querySelector('.card'), { opacity: 0, y: 12, scale: .98, duration: .22, ease: 'power2.out' });
+    }
+
+    async function saveSimulationResult() {
+      try {
+        if (!selectedBando) return;
+        const usedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
+        await supabaseClient.from('simulazioni').insert({
+          user_id: currentUser.id,
+          bando_id: selectedBando.id,
+          difficulty: selectedDifficulty,
+          duration_minutes: selectedDuration,
+          questions_total: questionIndex,
+          time_used_seconds: usedSeconds,
+          clarity_score: feedback.clarity,
+          structure_score: feedback.structure,
+          content_score: feedback.content
+        });
+      } catch (error) {
+        console.warn('Simulazioni table non disponibile o policy mancante:', error);
+      }
+    }
+
+    async function endSimulation() {
+      clearInterval(timerInterval);
+      confirmModal.classList.add('hidden');
+      simulationPhase.classList.add('hidden');
+      await saveSimulationResult();
+
+      const usedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
+      summaryPhase.innerHTML = `
+        <section class="card w-full max-w-xl text-center">
+          <div class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-green-100 text-2xl text-green-700">✓</div>
+          <h1 class="mt-5 text-2xl font-black tracking-tight text-brand-900">Simulazione completata ✓</h1>
+          <div class="mt-6 grid gap-3 text-left sm:grid-cols-2">
+            <div class="rounded-2xl border border-brand-200 bg-white/70 p-4"><p class="text-xs font-black uppercase tracking-widest text-gray-500">Domande totali</p><p class="mt-1 text-2xl font-black text-brand-900">${questionIndex}</p></div>
+            <div class="rounded-2xl border border-brand-200 bg-white/70 p-4"><p class="text-xs font-black uppercase tracking-widest text-gray-500">Tempo usato</p><p class="mt-1 text-2xl font-black text-brand-900">${formatTime(usedSeconds)}</p></div>
+            <div class="rounded-2xl border border-brand-200 bg-white/70 p-4"><p class="text-xs font-black uppercase tracking-widest text-gray-500">Chiarezza</p><p class="mt-1 text-2xl font-black text-brand-900">${feedback.clarity}/10</p></div>
+            <div class="rounded-2xl border border-brand-200 bg-white/70 p-4"><p class="text-xs font-black uppercase tracking-widest text-gray-500">Struttura</p><p class="mt-1 text-2xl font-black text-brand-900">${feedback.structure}/10</p></div>
+            <div class="rounded-2xl border border-brand-200 bg-white/70 p-4 sm:col-span-2"><p class="text-xs font-black uppercase tracking-widest text-gray-500">Contenuto</p><p class="mt-1 text-2xl font-black text-brand-900">${feedback.content}/10</p></div>
+          </div>
+          <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a href="dashboard.html" class="btn-primary flex-1">Torna alla Dashboard</a>
+            <button type="button" class="flex-1 rounded-full border border-brand-200 bg-white px-4 py-3 text-sm font-black text-brand-700 transition hover:bg-brand-50">Vedi Report Completo</button>
+          </div>
+        </section>
+      `;
+      summaryPhase.classList.remove('hidden');
+      if (window.gsap) gsap.from(summaryPhase.querySelector('.card'), { opacity: 0, y: 16, duration: .36, ease: 'power3.out' });
+    }
+
+    function initEvents() {
+      bandoSelect.addEventListener('change', () => {
+        startButton.disabled = !bandoSelect.value;
+      });
+
+      difficultyCards.forEach(card => {
+        card.addEventListener('click', () => {
+          difficultyCards.forEach(item => item.classList.remove('active'));
+          card.classList.add('active');
+          selectedDifficulty = card.dataset.difficulty;
+        });
+      });
+
+      durationButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          durationButtons.forEach(item => item.classList.remove('active'));
+          button.classList.add('active');
+          selectedDuration = Number(button.dataset.duration);
+        });
+      });
+
+      startButton.addEventListener('click', startSimulation);
+      endButton.addEventListener('click', requestEndSimulation);
+      cancelEndButton.addEventListener('click', () => confirmModal.classList.add('hidden'));
+      confirmEndButton.addEventListener('click', endSimulation);
+      sendButton.addEventListener('click', sendAnswer);
+      feedbackToggle.addEventListener('click', () => feedbackPanel.classList.toggle('open'));
+
+      answerInput.addEventListener('input', autoResizeInput);
+      answerInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          sendAnswer();
+        }
+      });
+    }
+
+    async function init() {
+      if (!supabaseClient) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      try {
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
+        if (error || !user) {
+          window.location.href = 'auth.html';
+          return;
+        }
+
+        currentUser = user;
+        initEvents();
+        await loadBandi();
+        loader.style.display = 'none';
+        configPhase.classList.remove('hidden');
+        animateInConfig();
+      } catch (error) {
+        loader.style.display = 'none';
+        configPhase.classList.remove('hidden');
+        showToast(error.message || 'Errore caricamento simulazione', 'error');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
