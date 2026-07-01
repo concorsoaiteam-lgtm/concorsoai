@@ -1129,6 +1129,231 @@
       .commissioner-tags { gap: 5px; }
     }
 
+
+
+    /* Claude-level refinement pass — blue/white ConcorsoAI */
+    body {
+      background:
+        radial-gradient(circle at 12% -8%, rgba(37,99,235,.13), transparent 34rem),
+        radial-gradient(circle at 90% 4%, rgba(94,160,232,.12), transparent 30rem),
+        linear-gradient(180deg, #F7FBFF 0%, #FFFFFF 32%, #F7FBFF 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(15,76,129,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,76,129,.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 50% 18%, black 0%, transparent 72%);
+    }
+
+    .feedback-track {
+      height: 6px;
+      background: rgba(37,99,235,0.1);
+      border-radius: 3px;
+    }
+
+    .feedback-fill {
+      border-radius: 3px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease;
+    }
+
+    .feedback-label span:last-child {
+      font-weight: 600;
+      transition: color .25s ease;
+    }
+
+    .commissioner-card {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(37,99,235,0.15);
+      box-shadow: 0 4px 24px rgba(37,99,235,0.08);
+    }
+
+    .commissioner-avatar-large {
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      font-weight: 700;
+    }
+
+    .commissioner-avatar-large::after { display: none; }
+
+    .online-dot {
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid #FFFFFF;
+      border-radius: 999px;
+      background: #22C55E;
+      animation: onlinePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes onlinePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    .commissioner-tag {
+      background: rgba(37,99,235,0.08);
+      color: #0F4C81;
+      border-color: transparent;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .message-row {
+      margin: 0 0 16px;
+    }
+
+    .message-row.assistant .bubble {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(37,99,235,0.1);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+      border-radius: 4px 16px 16px 16px;
+      padding: 16px 20px;
+      line-height: 1.65;
+      font-size: 0.9375rem;
+      color: #0B2A4A;
+    }
+
+    .message-row.user .bubble {
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      border-radius: 16px 4px 16px 16px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+      padding: 16px 20px;
+      color: #FFFFFF;
+    }
+
+    .message-role {
+      font-weight: 600;
+      font-size: 0.8125rem;
+      color: #0F4C81;
+      margin-bottom: 6px;
+    }
+
+    .message-role::before {
+      background: #22C55E;
+      animation: onlinePulse 2s ease-in-out infinite;
+    }
+
+    .timestamp {
+      margin-top: 6px;
+      font-size: .75rem;
+    }
+
+    .input-shell {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(37,99,235,0.1);
+    }
+
+    .answer-input {
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 0.9375rem;
+    }
+
+    .answer-input:focus {
+      border-color: #2563EB;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .answer-input::placeholder { color: #A1A1AA; }
+
+    .send-btn {
+      width: auto;
+      height: auto;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      transition: all 0.15s ease;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(37,99,235,0.36);
+    }
+
+    .send-btn:active:not(:disabled) { transform: scale(0.95); }
+
+    .bando-card {
+      padding: 16px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(37,99,235,0.1);
+      border-radius: 12px;
+      transition: all 0.15s ease;
+    }
+
+    .bando-card:hover {
+      border-color: rgba(37,99,235,0.3);
+      background: #FFFFFF;
+      box-shadow: 0 4px 18px rgba(37,99,235,0.08);
+    }
+
+    .bando-card.active {
+      border: 2px solid #2563EB;
+      background: rgba(37,99,235,0.04);
+      box-shadow: 0 6px 20px rgba(37,99,235,0.10);
+    }
+
+    .bando-icon {
+      color: #2563EB;
+      background: rgba(37,99,235,0.08);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .bando-name {
+      font-weight: 500;
+      color: #0B2A4A;
+    }
+
+    .bando-date {
+      font-size: 0.8125rem;
+      color: #4B6F8E;
+    }
+
+    .bando-card.active .bando-check {
+      border-color: #2563EB;
+      background: #2563EB;
+      color: #FFFFFF;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      color: #FFFFFF;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .start-btn:not(:disabled) {
+      box-shadow: 0 8px 24px rgba(37,99,235,0.3);
+    }
+
+    .start-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .start-btn:hover:not(:disabled) {
+      filter: brightness(1.05);
+      box-shadow: 0 12px 32px rgba(37,99,235,0.36);
+    }
+
+    .start-btn:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
+    .start-btn:active:not(:disabled) { transform: scale(0.98); }
+
   </style>
 </head>
 <body>
@@ -1149,14 +1374,14 @@
   <main id="configPhase" class="config-shell hidden">
     <section class="card config-card">
       <div class="config-anim">
-        <a href="dashboard.html" class="config-link mb-6 inline-flex text-sm font-black text-brand-600 transition hover:text-brand-800">← Dashboard</a>
+        <a href="dashboard.html" class="back-link config-link mb-6 inline-flex text-sm font-black text-brand-600 transition hover:text-brand-800">← Dashboard</a>
         <div class="config-title">
           <h1 class="text-2xl font-semibold tracking-tight text-brand-900">Configura la tua simulazione</h1>
           <p class="mt-2 text-sm font-semibold leading-6 text-brand-700">Scegli bando, livello e durata. L'AI sarà collegata nel prossimo step.</p>
         </div>
       </div>
 
-      <div class="config-anim mt-7">
+      <div class="bando-section config-anim mt-7">
         <p class="section-label">1. Seleziona bando</p>
         <p class="mb-3 text-sm font-semibold text-gray-500">Seleziona uno o più bandi da usare nella simulazione</p>
         <div id="bandoList" class="bando-list"></div>
@@ -1165,7 +1390,7 @@
         </div>
       </div>
 
-      <div class="config-anim mt-7">
+      <div class="difficulty-section config-anim mt-7">
         <p class="section-label">2. Difficoltà</p>
         <div class="grid gap-3">
           <button type="button" class="difficulty-card" data-difficulty="Facile">
@@ -1207,7 +1432,7 @@
         </div>
       </div>
 
-      <div class="config-anim mt-7">
+      <div class="duration-section config-anim mt-7">
         <p class="section-label">3. Durata</p>
         <div class="flex gap-2">
           <button type="button" class="duration-btn" data-duration="10">10 min</button>
@@ -1217,7 +1442,7 @@
       </div>
 
       <div class="config-anim mt-7">
-        <button id="startButton" type="button" class="btn-primary w-full" disabled>Inizia Simulazione <span class="btn-arrow">→</span></button>
+        <button id="startButton" type="button" class="start-btn btn-primary w-full" disabled>Inizia Simulazione <span class="btn-arrow">→</span></button>
       </div>
     </section>
   </main>
@@ -1244,7 +1469,7 @@
     <section class="sim-layout">
       <div id="chatArea" class="chat-area" aria-live="polite">
         <section class="commissioner-card" id="commissionerCard">
-          <div class="commissioner-avatar-large">CA</div>
+          <div class="commissioner-avatar-large">CA<span class="online-dot"></span></div>
           <div class="commissioner-info">
             <h2 class="commissioner-name">Commissario ConcorsoAI</h2>
             <p id="commissionerContext" class="commissioner-subtitle">Domande orali progressive, tono realistico e feedback sui punti deboli.</p>
@@ -1391,7 +1616,7 @@
 
     function feedbackColor(value) {
       if (value < 5) return '#EF4444';
-      if (value <= 7) return '#EAB308';
+      if (value <= 7) return '#2563EB';
       return '#22C55E';
     }
 
@@ -1400,20 +1625,30 @@
         const value = feedback[key];
         const fill = document.getElementById(key + 'Fill');
         const score = document.getElementById(key + 'Score');
+        const color = feedbackColor(value);
         fill.style.width = (value * 10) + '%';
-        fill.style.background = feedbackColor(value);
+        fill.style.background = color;
         score.textContent = value + '/10';
+        score.style.color = color;
       });
     }
 
     function animateInConfig() {
       if (!window.gsap) return;
-      gsap.from('.config-link', { opacity: 0, y: 16, duration: 0.5, delay: 0, ease: 'power2.out' });
-      gsap.from('.config-title', { opacity: 0, y: 16, duration: 0.5, delay: 0.1, ease: 'power2.out' });
-      gsap.from('.config-anim:nth-of-type(2)', { opacity: 0, y: 16, duration: 0.5, delay: 0.2, ease: 'power2.out' });
-      gsap.from('.config-anim:nth-of-type(3)', { opacity: 0, y: 16, duration: 0.5, delay: 0.3, ease: 'power2.out' });
-      gsap.from('.config-anim:nth-of-type(4)', { opacity: 0, y: 16, duration: 0.5, delay: 0.4, ease: 'power2.out' });
-      gsap.from('.config-anim:nth-of-type(5)', { opacity: 0, y: 16, duration: 0.5, delay: 0.5, ease: 'power2.out' });
+      gsap.from([
+        '.back-link',
+        '.config-title',
+        '.bando-section',
+        '.difficulty-section',
+        '.duration-section',
+        '.start-btn'
+      ], {
+        opacity: 0,
+        y: 18,
+        duration: 0.5,
+        ease: "power2.out",
+        stagger: 0.09
+      });
     }
 
     async function loadBandi() {
@@ -1696,6 +1931,13 @@
           difficultyCards.forEach(item => item.classList.remove('active'));
           card.classList.add('active');
           selectedDifficulty = card.dataset.difficulty;
+          if (window.gsap) {
+            gsap.from(card, {
+              scale: 0.98,
+              duration: 0.2,
+              ease: "back.out(2)"
+            });
+          }
         });
       });
 
