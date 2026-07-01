@@ -757,6 +757,155 @@
       .bubble-wrap { max-width: 88%; }
       .config-card { padding: 20px; border-radius: 20px; }
     }
+
+
+    /* Premium polish: micro-interazioni sobrie, meno “AI generated” */
+    .config-card {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(37,99,235,.13);
+      box-shadow: 0 18px 60px rgba(15,76,129,.09), 0 1px 0 rgba(255,255,255,.9) inset;
+    }
+
+    .config-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(37,99,235,.45), transparent);
+      opacity: .72;
+    }
+
+    .config-card::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 180px;
+      height: 180px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(37,99,235,.10), transparent 68%);
+      pointer-events: none;
+    }
+
+    .section-label {
+      letter-spacing: -.01em;
+      color: #0B2A4A;
+    }
+
+    .bando-list {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(37,99,235,.24) transparent;
+    }
+
+    .bando-list::-webkit-scrollbar { width: 6px; }
+    .bando-list::-webkit-scrollbar-thumb { background: rgba(37,99,235,.22); border-radius: 999px; }
+
+    .bando-card {
+      transform: translateZ(0);
+      box-shadow: 0 1px 0 rgba(255,255,255,.85) inset;
+    }
+
+    .bando-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(37,99,235,.09), 0 1px 0 rgba(255,255,255,.9) inset;
+    }
+
+    .bando-card.active {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(37,99,235,.13), 0 0 0 1px rgba(37,99,235,.08) inset;
+    }
+
+    .difficulty-card {
+      box-shadow: 0 1px 0 rgba(255,255,255,.86) inset;
+    }
+
+    .difficulty-card:hover {
+      box-shadow: 0 12px 30px rgba(37,99,235,.08), 0 1px 0 rgba(255,255,255,.92) inset;
+    }
+
+    .difficulty-card.active {
+      transform: translateY(-1px);
+    }
+
+    .duration-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .duration-btn::after {
+      content: "";
+      position: absolute;
+      inset: auto 18% 0;
+      height: 1px;
+      background: currentColor;
+      opacity: 0;
+      transform: scaleX(.4);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .duration-btn:hover::after { opacity: .18; transform: scaleX(1); }
+    .duration-btn.active::after { display: none; }
+
+    .btn-primary {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.22) 42%, transparent 62%);
+      transform: translateX(-120%);
+      transition: transform .7s ease;
+    }
+
+    .btn-primary:hover:not(:disabled)::before { transform: translateX(120%); }
+    .btn-primary > * { position: relative; z-index: 1; }
+
+    .sim-navbar { box-shadow: 0 1px 0 rgba(255,255,255,.7) inset; }
+
+    .info-inner {
+      filter: drop-shadow(0 8px 22px rgba(37,99,235,.07));
+    }
+
+    .chat-area {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(37,99,235,.22) transparent;
+    }
+
+    .chat-area::-webkit-scrollbar { width: 7px; }
+    .chat-area::-webkit-scrollbar-thumb { background: rgba(37,99,235,.20); border-radius: 999px; }
+
+    .message-row.assistant .bubble,
+    .message-row.user .bubble {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .feedback-panel {
+      box-shadow: 0 14px 44px rgba(15,76,129,.08), 0 1px 0 rgba(255,255,255,.9) inset;
+    }
+
+    .feedback-row:hover .feedback-fill {
+      filter: saturate(1.12);
+    }
+
+    .input-shell {
+      box-shadow: 0 -10px 34px rgba(15,76,129,.06);
+    }
+
+    .answer-input::placeholder { color: rgba(107,114,128,.78); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .config-card { animation: panelFloat 8s ease-in-out infinite; }
+      @keyframes panelFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1132,6 +1281,15 @@
     }
 
     function startSimulationUI() {
+      if (window.gsap) {
+        gsap.from(['.sim-navbar', '.info-bar', '.feedback-panel', '.input-shell'], {
+          opacity: 0,
+          y: (index) => index < 2 ? -8 : 10,
+          duration: 0.36,
+          stagger: 0.06,
+          ease: 'power2.out'
+        });
+      }
       startTimer(selectedDuration);
       addMessage('assistant', 'Buongiorno, iniziamo la simulazione orale. Risponda come se fosse davanti alla commissione: tono chiaro, struttura ordinata, esempi quando servono.');
       addMessage('assistant', placeholderQuestions[0]);
@@ -1232,6 +1390,27 @@
       if (window.gsap) gsap.from(summaryPhase.querySelector('.card'), { opacity: 0, y: 16, duration: .36, ease: 'power3.out' });
     }
 
+    function initPremiumInteractions() {
+      if (!window.gsap) return;
+
+      document.querySelectorAll('.difficulty-card, .bando-card').forEach(card => {
+        card.addEventListener('mousemove', (event) => {
+          const rect = card.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          const rotateY = ((x / rect.width) - 0.5) * 2.2;
+          const rotateX = -((y / rect.height) - 0.5) * 2.2;
+          gsap.to(card, { rotateX, rotateY, y: -2, duration: 0.25, ease: 'power2.out', transformPerspective: 900 });
+        });
+
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, { rotateX: 0, rotateY: 0, y: 0, duration: 0.35, ease: 'power2.out' });
+        });
+      });
+
+      gsap.from('.sim-navbar, .info-bar', { opacity: 0, y: -8, duration: .35, stagger: .06, ease: 'power2.out', paused: true });
+    }
+
     function initEvents() {
       bandoList.addEventListener('click', (event) => {
         const card = event.target.closest('[data-bando-id]');
@@ -1293,6 +1472,7 @@
         currentUser = user;
         initEvents();
         await loadBandi();
+        initPremiumInteractions();
         loader.style.display = 'none';
         configPhase.classList.remove('hidden');
         animateInConfig();
