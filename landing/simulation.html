@@ -906,11 +906,237 @@
       }
     }
 
+
+
+    /* Background vivo stile landing: aurora + orbs fluttuanti */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      pointer-events: none;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(37,99,235,.10), transparent 26rem),
+        radial-gradient(circle at 82% 12%, rgba(94,160,232,.10), transparent 28rem),
+        radial-gradient(circle at 50% 92%, rgba(15,76,129,.075), transparent 30rem);
+    }
+
+    .ambient-bg::before,
+    .ambient-bg::after {
+      content: "";
+      position: absolute;
+      width: 54rem;
+      height: 54rem;
+      border-radius: 999px;
+      filter: blur(42px);
+      opacity: .32;
+      transform: translate3d(0,0,0);
+      will-change: transform;
+    }
+
+    .ambient-bg::before {
+      left: -18rem;
+      top: -16rem;
+      background: conic-gradient(from 140deg, rgba(37,99,235,.18), rgba(94,160,232,.08), rgba(15,76,129,.14), rgba(37,99,235,.18));
+      animation: auroraDriftA 18s ease-in-out infinite alternate;
+    }
+
+    .ambient-bg::after {
+      right: -20rem;
+      bottom: -22rem;
+      background: conic-gradient(from 20deg, rgba(94,160,232,.14), rgba(37,99,235,.08), rgba(15,76,129,.12), rgba(94,160,232,.14));
+      animation: auroraDriftB 22s ease-in-out infinite alternate;
+    }
+
+    .orb {
+      will-change: transform;
+      animation: orbFloat 10s ease-in-out infinite;
+    }
+
+    .orb-1 { animation-delay: 0s; }
+    .orb-2 { animation-delay: -3s; }
+
+    .orb-3 {
+      right: 14%;
+      bottom: 12%;
+      width: 12rem;
+      height: 12rem;
+      background: rgba(37,99,235,.08);
+      animation-delay: -6s;
+    }
+
+    .premium-grid-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .55;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 22%), rgba(37,99,235,.10), transparent 22rem);
+      transition: background .25s ease;
+    }
+
+    @keyframes auroraDriftA {
+      0% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+      50% { transform: translate3d(7rem,4rem,0) rotate(16deg) scale(1.06); }
+      100% { transform: translate3d(12rem,-1rem,0) rotate(28deg) scale(.98); }
+    }
+
+    @keyframes auroraDriftB {
+      0% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+      50% { transform: translate3d(-6rem,-5rem,0) rotate(-18deg) scale(1.08); }
+      100% { transform: translate3d(-12rem,2rem,0) rotate(-30deg) scale(1); }
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      33% { transform: translate3d(18px,-22px,0) scale(1.03); }
+      66% { transform: translate3d(-14px,18px,0) scale(.98); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ambient-bg::before,
+      .ambient-bg::after,
+      .orb { animation: none !important; }
+    }
+
+
+
+    /* Commissario più presente e credibile */
+    .commissioner-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 6px 0 20px;
+      padding: 16px;
+      border: 1px solid rgba(37,99,235,.12);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(247,251,255,.82));
+      box-shadow: 0 10px 34px rgba(15,76,129,.07), 0 1px 0 rgba(255,255,255,.92) inset;
+      overflow: hidden;
+    }
+
+    .commissioner-card::after {
+      content: "";
+      position: absolute;
+      right: -50px;
+      top: -70px;
+      width: 150px;
+      height: 150px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(37,99,235,.10), transparent 68%);
+      pointer-events: none;
+    }
+
+    .commissioner-avatar-large {
+      position: relative;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      color: #FFFFFF;
+      font-size: .86rem;
+      font-weight: 850;
+      box-shadow: 0 14px 30px rgba(37,99,235,.18);
+    }
+
+    .commissioner-avatar-large::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid #FFFFFF;
+      border-radius: 999px;
+      background: #22C55E;
+    }
+
+    .commissioner-info { min-width: 0; position: relative; z-index: 1; }
+    .commissioner-name {
+      color: #0B2A4A;
+      font-size: .96rem;
+      font-weight: 850;
+      letter-spacing: -.02em;
+    }
+
+    .commissioner-subtitle {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: .82rem;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .commissioner-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .commissioner-tag {
+      border: 1px solid rgba(37,99,235,.12);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(37,99,235,.055);
+      color: var(--text-secondary);
+      font-size: .7rem;
+      font-weight: 800;
+    }
+
+    .message-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      color: #0B3A63;
+      font-size: .74rem;
+      font-weight: 850;
+      letter-spacing: -.01em;
+    }
+
+    .message-role::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22C55E;
+      box-shadow: 0 0 0 3px rgba(34,197,94,.12);
+    }
+
+    .message-row.assistant .bubble {
+      position: relative;
+    }
+
+    .message-row.assistant .bubble::before {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: 14px;
+      bottom: 14px;
+      width: 2px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(37,99,235,.45), rgba(94,160,232,.12));
+    }
+
+    @media (max-width: 640px) {
+      .commissioner-card { align-items: flex-start; padding: 14px; }
+      .commissioner-avatar-large { width: 42px; height: 42px; border-radius: 14px; }
+      .commissioner-tags { gap: 5px; }
+    }
+
   </style>
 </head>
 <body>
+  <div class="ambient-bg"></div>
+  <div class="premium-grid-glow"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
   <svg class="noise" width="100%" height="100%" aria-hidden="true">
     <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4" stitchTiles="stitch" /></filter>
     <rect width="100%" height="100%" filter="url(#noise)" />
@@ -1016,7 +1242,20 @@
     <button id="feedbackToggle" type="button" class="mobile-feedback-toggle">📊 Feedback</button>
 
     <section class="sim-layout">
-      <div id="chatArea" class="chat-area" aria-live="polite"></div>
+      <div id="chatArea" class="chat-area" aria-live="polite">
+        <section class="commissioner-card" id="commissionerCard">
+          <div class="commissioner-avatar-large">CA</div>
+          <div class="commissioner-info">
+            <h2 class="commissioner-name">Commissario ConcorsoAI</h2>
+            <p id="commissionerContext" class="commissioner-subtitle">Domande orali progressive, tono realistico e feedback sui punti deboli.</p>
+            <div class="commissioner-tags">
+              <span class="commissioner-tag">Ascolta</span>
+              <span class="commissioner-tag">Incalza</span>
+              <span class="commissioner-tag">Valuta</span>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <aside id="feedbackPanel" class="feedback-panel card">
         <h2 class="feedback-title">📊 Feedback live</h2>
@@ -1075,6 +1314,7 @@
     const questionCounter = document.getElementById('questionCounter');
     const timerDisplay = document.getElementById('timerDisplay');
     const chatArea = document.getElementById('chatArea');
+    const commissionerContext = document.getElementById('commissionerContext');
     const answerInput = document.getElementById('answerInput');
     const sendButton = document.getElementById('sendButton');
     const endButton = document.getElementById('endButton');
@@ -1103,6 +1343,29 @@
       'Le faccio una domanda più concreta: come applicherebbe questo concetto in un caso operativo dentro una pubblica amministrazione?',
       'Ultima precisazione: quali errori commetterebbe un candidato impreparato su questo tema?'
     ];
+
+    function initAmbientMotion() {
+      const glow = document.querySelector('.premium-grid-glow');
+      const orbs = document.querySelectorAll('.orb');
+      if (!glow) return;
+
+      window.addEventListener('mousemove', (event) => {
+        const x = (event.clientX / window.innerWidth) * 100;
+        const y = (event.clientY / window.innerHeight) * 100;
+        glow.style.setProperty('--mx', x + '%');
+        glow.style.setProperty('--my', y + '%');
+
+        if (window.gsap) {
+          gsap.to(orbs, {
+            x: (x - 50) * 0.22,
+            y: (y - 50) * 0.16,
+            duration: 1.2,
+            ease: 'power3.out',
+            overwrite: 'auto'
+          });
+        }
+      }, { passive: true });
+    }
 
     function showToast(msg, type = 'success') {
       const toast = document.createElement('div');
@@ -1189,6 +1452,7 @@
         row.innerHTML = `
           <div class="avatar">CA</div>
           <div class="bubble-wrap">
+            <div class="message-role">Commissario</div>
             <div class="bubble">${thinking ? '<div class="thinking-bubble"><span class="thinking-dot"></span><span class="thinking-dot"></span><span class="thinking-dot"></span></div>' : text}</div>
             <div class="timestamp">${nowLabel()}</div>
           </div>
@@ -1282,7 +1546,7 @@
 
     function startSimulationUI() {
       if (window.gsap) {
-        gsap.from(['.sim-navbar', '.info-bar', '.feedback-panel', '.input-shell'], {
+        gsap.from(['.sim-navbar', '.info-bar', '#commissionerCard', '.feedback-panel', '.input-shell'], {
           opacity: 0,
           y: (index) => index < 2 ? -8 : 10,
           duration: 0.36,
@@ -1290,8 +1554,11 @@
           ease: 'power2.out'
         });
       }
+      commissionerContext.textContent = selectedBandi.length > 1
+        ? selectedBandi.length + ' bandi attivi · difficoltà ' + selectedDifficulty.toLowerCase() + ' · durata ' + selectedDuration + ' minuti'
+        : selectedBandi[0].filename + ' · difficoltà ' + selectedDifficulty.toLowerCase() + ' · durata ' + selectedDuration + ' minuti';
       startTimer(selectedDuration);
-      addMessage('assistant', 'Buongiorno, iniziamo la simulazione orale. Risponda come se fosse davanti alla commissione: tono chiaro, struttura ordinata, esempi quando servono.');
+      addMessage('assistant', 'Buongiorno. Da questo momento ragioniamo come in prova orale: risposta diretta, ordine logico e capacità di collegare gli argomenti. Se una risposta resta generica, la incalzerò.');
       addMessage('assistant', placeholderQuestions[0]);
       addMessage('user', 'Va bene, sono pronto. Inizio presentando il quadro generale e poi entro nei punti principali.');
     }
@@ -1470,6 +1737,7 @@
         }
 
         currentUser = user;
+        initAmbientMotion();
         initEvents();
         await loadBandi();
         initPremiumInteractions();
