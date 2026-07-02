@@ -14,6 +14,21 @@
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+
+  <div id="briefingOverlay" class="briefing-overlay hidden" aria-live="polite">
+    <section class="briefing-card">
+      <div class="briefing-orb">CA</div>
+      <h2 class="briefing-title">Preparazione della commissione</h2>
+      <div class="briefing-steps">
+        <div class="briefing-step active"><span></span>Analisi dei bandi selezionati</div>
+        <div class="briefing-step"><span></span>Calibrazione difficoltà</div>
+        <div class="briefing-step"><span></span>Costruzione prima domanda</div>
+      </div>
+      <div class="briefing-progress"><div class="briefing-progress-fill"></div></div>
+    </section>
+  </div>
+
   <script>
     tailwind.config = {
       theme: {
@@ -1773,6 +1788,592 @@
       .thinking-wave span { animation: none !important; }
     }
 
+
+
+    /* 11/10 pass: meno template, più prodotto reale */
+    .config-shell {
+      align-items: start;
+      padding-top: clamp(28px, 6vh, 72px);
+    }
+
+    .config-card {
+      max-width: 680px !important;
+      padding: 0 !important;
+      overflow: clip;
+      background: rgba(255,255,255,.94) !important;
+    }
+
+    .config-card > .config-anim:first-child {
+      padding: 28px 28px 22px;
+      border-bottom: 1px solid rgba(37,99,235,.10);
+      background:
+        radial-gradient(circle at 18% 0%, rgba(37,99,235,.08), transparent 16rem),
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,251,255,.72));
+    }
+
+    .config-card > .config-anim:not(:first-child) {
+      margin-top: 0 !important;
+      padding: 22px 28px;
+      border-bottom: 1px solid rgba(37,99,235,.08);
+    }
+
+    .config-card > .config-anim:last-child {
+      border-bottom: 0;
+      background: rgba(247,251,255,.52);
+    }
+
+    .back-link {
+      margin-bottom: 18px !important;
+      color: #4B6F8E !important;
+      font-weight: 650 !important;
+    }
+
+    .config-title h1 {
+      font-size: clamp(1.65rem, 3vw, 2.15rem) !important;
+      line-height: 1.08;
+      font-weight: 720 !important;
+      letter-spacing: -.055em;
+    }
+
+    .config-title p {
+      max-width: 34rem;
+      margin-top: 10px !important;
+      font-size: .95rem !important;
+      line-height: 1.65 !important;
+    }
+
+    .section-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .selected-count {
+      flex: 0 0 auto;
+      border: 1px solid rgba(37,99,235,.12);
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: rgba(37,99,235,.06);
+      color: #0F4C81;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    .bando-card {
+      grid-template-columns: 40px minmax(0, 1fr) 28px !important;
+      min-height: 72px;
+    }
+
+    .bando-check {
+      transform: scale(.86);
+      opacity: .42;
+    }
+
+    .bando-card.active .bando-check {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .difficulty-section .grid {
+      gap: 10px !important;
+    }
+
+    .difficulty-card h3 {
+      font-weight: 680 !important;
+      letter-spacing: -.025em;
+    }
+
+    .difficulty-card p {
+      line-height: 1.55 !important;
+    }
+
+    .duration-section .flex {
+      padding: 4px;
+      border: 1px solid rgba(37,99,235,.10);
+      border-radius: 16px;
+      background: rgba(247,251,255,.74);
+    }
+
+    .duration-btn {
+      border: 0 !important;
+      background: transparent !important;
+    }
+
+    .duration-btn.active {
+      background: #FFFFFF !important;
+      color: #0F4C81 !important;
+      box-shadow: 0 6px 18px rgba(15,76,129,.08), inset 0 0 0 1px rgba(37,99,235,.12) !important;
+    }
+
+    .start-btn {
+      min-height: 56px;
+      display: flex !important;
+      gap: 10px !important;
+      font-size: .98rem;
+      letter-spacing: -.01em;
+      opacity: 1 !important;
+    }
+
+    .start-btn:disabled {
+      opacity: .82 !important;
+      filter: saturate(.82) brightness(.94);
+    }
+
+    .start-btn .start-label {
+      color: #FFFFFF !important;
+      text-shadow: 0 1px 1px rgba(7,29,51,.12);
+    }
+
+    .start-helper {
+      margin-top: 10px;
+      text-align: center;
+      color: #4B6F8E;
+      font-size: .82rem;
+      font-weight: 550;
+      transition: color .2s ease;
+    }
+
+    .start-btn:not(:disabled) + .start-helper {
+      color: #0F4C81;
+    }
+
+    .sim-layout {
+      padding-top: 14px;
+    }
+
+    .chat-area {
+      padding-top: 4px;
+    }
+
+    .commissioner-card {
+      padding: 18px !important;
+    }
+
+    .message-row.assistant .bubble::before {
+      display: none;
+    }
+
+    .message-row.assistant .bubble,
+    .message-row.user .bubble {
+      max-width: 100%;
+    }
+
+    .bubble-wrap {
+      max-width: min(84%, 610px) !important;
+    }
+
+    .input-inner {
+      max-width: 760px;
+      padding: 14px 16px 18px;
+    }
+
+    .answer-input {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+    }
+
+    .send-btn {
+      min-width: 48px;
+      min-height: 48px;
+    }
+
+    @media (max-width: 640px) {
+      .config-card > .config-anim:first-child,
+      .config-card > .config-anim:not(:first-child) {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .bubble-wrap { max-width: 90% !important; }
+    }
+
+
+
+    /* Motion system: animazioni che danno feedback reale, non movimento casuale */
+    .start-btn.ready {
+      animation: readyBreath 2.2s ease-in-out infinite;
+    }
+
+    @keyframes readyBreath {
+      0%, 100% { box-shadow: 0 8px 24px rgba(37,99,235,.30); }
+      50% { box-shadow: 0 12px 34px rgba(37,99,235,.42); }
+    }
+
+    .selection-spark {
+      position: absolute;
+      inset: auto 14px 14px auto;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #2563EB;
+      pointer-events: none;
+      box-shadow: 0 0 0 0 rgba(37,99,235,.30);
+    }
+
+    .bando-card.active .bando-icon {
+      animation: iconPop .28s cubic-bezier(.2,.9,.2,1.4);
+    }
+
+    @keyframes iconPop {
+      0% { transform: scale(.92) rotate(-3deg); }
+      70% { transform: scale(1.08) rotate(2deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    .briefing-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(37,99,235,.14), transparent 24rem),
+        rgba(247,251,255,.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .briefing-card {
+      position: relative;
+      width: min(420px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(37,99,235,.14);
+      border-radius: 26px;
+      padding: 24px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 24px 80px rgba(15,76,129,.14), 0 1px 0 rgba(255,255,255,.94) inset;
+    }
+
+    .briefing-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent, rgba(37,99,235,.08), transparent);
+      transform: translateX(-100%);
+      animation: briefingSweep 1.6s ease-in-out infinite;
+    }
+
+    .briefing-orb {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      margin-bottom: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0F4C81, #2563EB);
+      color: #FFFFFF;
+      font-weight: 800;
+      box-shadow: 0 16px 34px rgba(37,99,235,.24);
+    }
+
+    .briefing-orb::before,
+    .briefing-orb::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border: 1px solid rgba(37,99,235,.22);
+      border-radius: 24px;
+      animation: briefingRing 1.8s ease-out infinite;
+    }
+
+    .briefing-orb::after { animation-delay: .45s; }
+
+    .briefing-title {
+      position: relative;
+      color: #0B2A4A;
+      font-size: 1.05rem;
+      font-weight: 720;
+      letter-spacing: -.025em;
+    }
+
+    .briefing-steps {
+      position: relative;
+      display: grid;
+      gap: 9px;
+      margin-top: 16px;
+    }
+
+    .briefing-step {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #4B6F8E;
+      font-size: .86rem;
+      font-weight: 560;
+    }
+
+    .briefing-step span {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(37,99,235,.30);
+    }
+
+    .briefing-step.active {
+      color: #0F4C81;
+    }
+
+    .briefing-step.active span {
+      background: #2563EB;
+      box-shadow: 0 0 0 5px rgba(37,99,235,.10);
+    }
+
+    .briefing-progress {
+      position: relative;
+      height: 4px;
+      margin-top: 18px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(37,99,235,.10);
+    }
+
+    .briefing-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0F4C81, #2563EB);
+    }
+
+    @keyframes briefingSweep {
+      0% { transform: translateX(-100%); opacity: 0; }
+      30%, 70% { opacity: 1; }
+      100% { transform: translateX(100%); opacity: 0; }
+    }
+
+    @keyframes briefingRing {
+      0% { transform: scale(.88); opacity: .55; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .start-btn.ready,
+      .bando-card.active .bando-icon,
+      .briefing-card::before,
+      .briefing-orb::before,
+      .briefing-orb::after { animation: none !important; }
+    }
+
+
+
+    /* 10+ UX motion upgrades: feedback immediato, progressione, dettagli memorabili */
+    .session-progress {
+      height: 2px;
+      width: min(720px, calc(100% - 32px));
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(37,99,235,.08);
+    }
+
+    .session-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0F4C81, #2563EB, #5EA0E8);
+      transition: width .55s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 18px rgba(37,99,235,.28);
+    }
+
+    .info-pill.progress-pop {
+      animation: progressPop .34s cubic-bezier(.2,.9,.2,1.3);
+    }
+
+    @keyframes progressPop {
+      0% { transform: scale(.98); }
+      65% { transform: scale(1.035); }
+      100% { transform: scale(1); }
+    }
+
+    .composer-meta {
+      max-width: 720px;
+      margin: -6px auto 12px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #4B6F8E;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    .shortcut-key {
+      border: 1px solid rgba(37,99,235,.12);
+      border-radius: 7px;
+      padding: 2px 6px;
+      background: rgba(255,255,255,.72);
+      color: #0F4C81;
+      font-weight: 750;
+    }
+
+    .typing-meter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 150px;
+    }
+
+    .typing-meter-track {
+      flex: 1;
+      height: 3px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(37,99,235,.10);
+    }
+
+    .typing-meter-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2563EB, #22C55E);
+      transition: width .28s ease, background .28s ease;
+    }
+
+    .input-shell.composer-active {
+      box-shadow: 0 -14px 38px rgba(37,99,235,.10);
+    }
+
+    .answer-input.typing-pulse {
+      animation: typingPulse .22s ease;
+    }
+
+    @keyframes typingPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.003); }
+      100% { transform: scale(1); }
+    }
+
+    .send-btn.sending {
+      pointer-events: none;
+      animation: sendPulse .7s ease-in-out infinite;
+    }
+
+    @keyframes sendPulse {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.04); filter: brightness(1.08); }
+    }
+
+    .message-row.user.sent .bubble {
+      position: relative;
+      padding-right: 44px !important;
+    }
+
+    .message-row.user.sent .bubble::after {
+      content: "✓";
+      position: absolute;
+      right: 16px;
+      bottom: 13px;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      color: rgba(255,255,255,.86);
+      font-size: .72rem;
+      font-weight: 900;
+      animation: checkIn .34s cubic-bezier(.2,.9,.2,1.35);
+    }
+
+    @keyframes checkIn {
+      0% { transform: scale(.4) rotate(-20deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .question-glow .bubble {
+      animation: questionGlow 1.15s ease-out;
+    }
+
+    @keyframes questionGlow {
+      0% { box-shadow: 0 0 0 0 rgba(37,99,235,.22), 0 2px 8px rgba(37,99,235,.06); }
+      42% { box-shadow: 0 0 0 8px rgba(37,99,235,.08), 0 8px 28px rgba(37,99,235,.12); }
+      100% { box-shadow: 0 0 0 0 rgba(37,99,235,0), 0 2px 8px rgba(37,99,235,.06); }
+    }
+
+    .feedback-fill.updated {
+      animation: barConfirm .55s ease;
+    }
+
+    @keyframes barConfirm {
+      0% { filter: saturate(1); }
+      50% { filter: saturate(1.35) brightness(1.08); }
+      100% { filter: saturate(1); }
+    }
+
+    .score-bump {
+      animation: scoreBump .32s cubic-bezier(.2,.9,.2,1.35);
+    }
+
+    @keyframes scoreBump {
+      0% { transform: translateY(0) scale(1); }
+      55% { transform: translateY(-2px) scale(1.08); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    .scroll-bottom-btn {
+      position: fixed;
+      left: 50%;
+      bottom: 104px;
+      z-index: 44;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(37,99,235,.14);
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      color: #0F4C81;
+      font-size: .78rem;
+      font-weight: 750;
+      box-shadow: 0 10px 28px rgba(15,76,129,.10);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .scroll-bottom-btn.hidden-soft {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(8px);
+    }
+
+    .chat-area.near-bottom {
+      mask-image: linear-gradient(to bottom, transparent 0, black 18px, black calc(100% - 28px), transparent 100%);
+    }
+
+    .focus-ripple {
+      position: absolute;
+      pointer-events: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(37,99,235,.34);
+      transform: translate(-50%, -50%);
+    }
+
+    .mini-celebration {
+      position: fixed;
+      z-index: 140;
+      pointer-events: none;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #2563EB;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .start-btn.ready,
+      .info-pill.progress-pop,
+      .answer-input.typing-pulse,
+      .send-btn.sending,
+      .message-row.user.sent .bubble::after,
+      .question-glow .bubble,
+      .feedback-fill.updated,
+      .score-bump { animation: none !important; }
+    }
+
 </style>
 </head>
 <body>
@@ -1801,7 +2402,10 @@
       </div>
 
       <div class="bando-section config-anim mt-7">
-        <p class="section-label">1. Seleziona bando</p>
+        <div class="section-kicker">
+          <p class="section-label">1. Seleziona bando</p>
+          <span id="selectedBandiCount" class="selected-count">0 selezionati</span>
+        </div>
         <p class="mb-3 text-sm font-semibold text-gray-500">Seleziona uno o più bandi da usare nella simulazione</p>
         <div id="bandoList" class="bando-list"></div>
         <div id="emptyBandi" class="empty-bandi mt-3 hidden">
@@ -1861,7 +2465,8 @@
       </div>
 
       <div class="config-anim mt-7">
-        <button id="startButton" type="button" class="start-btn btn-primary w-full" disabled><span class="start-label">Inizia Simulazione</span><span class="btn-arrow">→</span></button>
+        <button id="startButton" type="button" class="start-btn btn-primary w-full" disabled><span class="start-label">Seleziona un bando per iniziare</span><span class="btn-arrow">→</span></button>
+        <p id="startHelper" class="start-helper">Appena scegli almeno un bando, la simulazione si sblocca.</p>
       </div>
     </section>
   </main>
@@ -1877,13 +2482,15 @@
 
     <section class="info-bar">
       <div class="info-inner">
-        <div class="info-pill">Domanda <span id="questionCounter">1/8</span></div>
+        <div class="info-pill" id="questionPill">Domanda <span id="questionCounter">1/8</span></div>
         <div class="info-pill">Timer <span id="timerDisplay">20:00</span></div>
         <div class="info-pill">Difficoltà: <span id="difficultyDisplay">Realistico</span></div>
       </div>
+      <div class="session-progress"><div id="sessionProgressFill" class="session-progress-fill"></div></div>
     </section>
 
     <button id="feedbackToggle" type="button" class="mobile-feedback-toggle">📊 Feedback</button>
+    <button id="scrollBottomButton" type="button" class="scroll-bottom-btn hidden-soft">Nuovi messaggi ↓</button>
 
     <section class="sim-layout">
       <div id="chatArea" class="chat-area" aria-live="polite">
@@ -1923,6 +2530,10 @@
         <textarea id="answerInput" class="answer-input" rows="1" placeholder="Scrivi la tua risposta..."></textarea>
         <button id="sendButton" class="send-btn" type="button" aria-label="Invia risposta">↑</button>
       </div>
+      <div class="composer-meta">
+        <span><span class="shortcut-key">Enter</span> invia · <span class="shortcut-key">Shift</span> + <span class="shortcut-key">Enter</span> va a capo</span>
+        <span class="typing-meter"><span id="answerMeterText">Risposta breve</span><span class="typing-meter-track"><span id="answerMeterFill" class="typing-meter-fill"></span></span></span>
+      </div>
     </section>
   </main>
 
@@ -1939,6 +2550,21 @@
     </section>
   </div>
 
+
+
+  <div id="briefingOverlay" class="briefing-overlay hidden" aria-live="polite">
+    <section class="briefing-card">
+      <div class="briefing-orb">CA</div>
+      <h2 class="briefing-title">Preparazione della commissione</h2>
+      <div class="briefing-steps">
+        <div class="briefing-step active"><span></span>Analisi dei bandi selezionati</div>
+        <div class="briefing-step"><span></span>Calibrazione difficoltà</div>
+        <div class="briefing-step"><span></span>Costruzione prima domanda</div>
+      </div>
+      <div class="briefing-progress"><div class="briefing-progress-fill"></div></div>
+    </section>
+  </div>
+
   <script>
     const SUPABASE_URL = ['https://','xhifnparcouxsypkjcmn','.supabase.co'].join('');
     const SUPABASE_KEY = ['sb_publishable_','dVYESGcHAV13d5aI1uC7wQ','_pQ0r1qT2'].join('');
@@ -1950,12 +2576,17 @@
     const summaryPhase = document.getElementById('summaryPhase');
     const bandoList = document.getElementById('bandoList');
     const emptyBandi = document.getElementById('emptyBandi');
+    const selectedBandiCount = document.getElementById('selectedBandiCount');
+    const startHelper = document.getElementById('startHelper');
+    const startLabel = document.querySelector('#startButton .start-label');
     const startButton = document.getElementById('startButton');
     const difficultyCards = document.querySelectorAll('.difficulty-card');
     const durationButtons = document.querySelectorAll('.duration-btn');
     const navBandoName = document.getElementById('navBandoName');
     const difficultyDisplay = document.getElementById('difficultyDisplay');
     const questionCounter = document.getElementById('questionCounter');
+    const questionPill = document.getElementById('questionPill');
+    const sessionProgressFill = document.getElementById('sessionProgressFill');
     const timerDisplay = document.getElementById('timerDisplay');
     const chatArea = document.getElementById('chatArea');
     const commissionerContext = document.getElementById('commissionerContext');
@@ -1966,7 +2597,11 @@
     const cancelEndButton = document.getElementById('cancelEndButton');
     const confirmEndButton = document.getElementById('confirmEndButton');
     const feedbackToggle = document.getElementById('feedbackToggle');
+    const scrollBottomButton = document.getElementById('scrollBottomButton');
+    const answerMeterText = document.getElementById('answerMeterText');
+    const answerMeterFill = document.getElementById('answerMeterFill');
     const feedbackPanel = document.getElementById('feedbackPanel');
+    const briefingOverlay = document.getElementById('briefingOverlay');
 
     let currentUser = null;
     let bandi = [];
@@ -2039,6 +2674,69 @@
       return '#22C55E';
     }
 
+    function updateSessionProgress() {
+      const percent = Math.max(0, Math.min(100, ((questionIndex - 1) / Math.max(1, totalQuestions)) * 100));
+      if (sessionProgressFill) sessionProgressFill.style.width = percent + '%';
+      if (questionPill) {
+        questionPill.classList.remove('progress-pop');
+        void questionPill.offsetWidth;
+        questionPill.classList.add('progress-pop');
+      }
+    }
+
+    function pulseFeedbackElement(el) {
+      if (!el) return;
+      el.classList.remove('updated', 'score-bump');
+      void el.offsetWidth;
+      if (el.classList.contains('feedback-fill')) el.classList.add('updated');
+      else el.classList.add('score-bump');
+    }
+
+    function updateAnswerMeter() {
+      if (!answerMeterFill || !answerMeterText) return;
+      const words = answerInput.value.trim() ? answerInput.value.trim().split(/\s+/).length : 0;
+      const percent = Math.min(100, Math.round((words / 80) * 100));
+      answerMeterFill.style.width = percent + '%';
+      if (words < 18) {
+        answerMeterText.textContent = 'Risposta breve';
+        answerMeterFill.style.background = 'linear-gradient(90deg, #2563EB, #5EA0E8)';
+      } else if (words < 55) {
+        answerMeterText.textContent = 'Buona struttura';
+        answerMeterFill.style.background = 'linear-gradient(90deg, #2563EB, #22C55E)';
+      } else {
+        answerMeterText.textContent = 'Risposta solida';
+        answerMeterFill.style.background = 'linear-gradient(90deg, #0F4C81, #22C55E)';
+      }
+    }
+
+    function celebrateSend() {
+      if (!window.gsap) return;
+      const rect = sendButton.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'mini-celebration';
+        dot.style.left = rect.left + rect.width / 2 + 'px';
+        dot.style.top = rect.top + rect.height / 2 + 'px';
+        dot.style.background = i % 3 === 0 ? '#22C55E' : '#2563EB';
+        document.body.appendChild(dot);
+        gsap.to(dot, {
+          x: Math.cos((i / 8) * Math.PI * 2) * gsap.utils.random(22, 42),
+          y: Math.sin((i / 8) * Math.PI * 2) * gsap.utils.random(22, 42),
+          opacity: 0,
+          scale: 0.4,
+          duration: 0.48,
+          ease: 'power2.out',
+          onComplete: () => dot.remove()
+        });
+      }
+    }
+
+    function updateScrollButton() {
+      if (!scrollBottomButton) return;
+      const distance = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight;
+      scrollBottomButton.classList.toggle('hidden-soft', distance < 110);
+    }
+
     function updateFeedback() {
       ['clarity', 'structure', 'content'].forEach(key => {
         const value = feedback[key];
@@ -2049,6 +2747,8 @@
         fill.style.background = color;
         score.textContent = value + '/10';
         score.style.color = color;
+        pulseFeedbackElement(fill);
+        pulseFeedbackElement(score);
       });
     }
 
@@ -2082,7 +2782,7 @@
 
       if (!bandi.length) {
         emptyBandi.classList.remove('hidden');
-        startButton.disabled = true;
+        updateStartState();
         return;
       }
 
@@ -2096,11 +2796,15 @@
           <span class="bando-check">✓</span>
         </button>
       `).join('');
+      updateStartState();
+      if (window.gsap) {
+        gsap.from('.bando-card', { opacity: 0, y: 10, duration: .34, stagger: .045, ease: 'power2.out' });
+      }
     }
 
     function addMessage(role, text, thinking = false) {
       const row = document.createElement('div');
-      row.className = 'message-row ' + (role === 'user' ? 'user' : 'assistant') + (thinking ? ' thinking-row' : '');
+      row.className = 'message-row ' + (role === 'user' ? 'user sent' : 'assistant') + (thinking ? ' thinking-row' : '') + (role === 'assistant' && !thinking ? ' question-glow' : '');
 
       if (role === 'assistant') {
         row.innerHTML = `
@@ -2123,6 +2827,7 @@
 
       chatArea.appendChild(row);
       chatArea.scrollTop = chatArea.scrollHeight;
+      updateScrollButton();
       if (window.gsap) {
         gsap.from(row, {
           opacity: 0,
@@ -2157,6 +2862,7 @@
 
     function updateQuestionCounter() {
       questionCounter.textContent = questionIndex + '/' + totalQuestions;
+      updateSessionProgress();
     }
 
     function startTimer(minutes) {
@@ -2181,6 +2887,27 @@
       }, 1000);
     }
 
+    function playBriefingAnimation(done) {
+      if (!briefingOverlay || !window.gsap) return done();
+      briefingOverlay.classList.remove('hidden');
+      const steps = briefingOverlay.querySelectorAll('.briefing-step');
+      const fill = briefingOverlay.querySelector('.briefing-progress-fill');
+      gsap.set(fill, { width: '0%' });
+      gsap.fromTo(briefingOverlay, { opacity: 0 }, { opacity: 1, duration: 0.22, ease: 'power2.out' });
+      gsap.fromTo('.briefing-card', { y: 18, scale: 0.97, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.34, ease: 'back.out(1.8)' });
+      gsap.to(fill, { width: '100%', duration: 1.05, ease: 'power2.inOut' });
+      steps.forEach((step, index) => {
+        gsap.delayedCall(index * 0.34, () => {
+          steps.forEach(item => item.classList.remove('active'));
+          step.classList.add('active');
+          gsap.fromTo(step, { x: -4, opacity: 0.65 }, { x: 0, opacity: 1, duration: 0.22, ease: 'power2.out' });
+        });
+      });
+      gsap.delayedCall(1.18, () => {
+        gsap.to(briefingOverlay, { opacity: 0, duration: 0.24, ease: 'power2.in', onComplete: () => { briefingOverlay.classList.add('hidden'); done(); } });
+      });
+    }
+
     function startSimulation() {
       if (!selectedBandi.length) return;
 
@@ -2193,22 +2920,24 @@
       updateFeedback();
 
       if (window.gsap) {
-        gsap.to(configPhase, {
-          opacity: 0,
-          y: -20,
-          duration: 0.3,
-          ease: "power2.in",
-          onComplete: () => {
-            configPhase.style.display = 'none';
-            simulationPhase.style.display = 'block';
-            simulationPhase.classList.remove('hidden');
-            gsap.from(simulationPhase, {
-              opacity: 0,
-              duration: 0.4,
-              ease: "power2.out"
-            });
-            startSimulationUI();
-          }
+        playBriefingAnimation(() => {
+          gsap.to(configPhase, {
+            opacity: 0,
+            y: -20,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: () => {
+              configPhase.style.display = 'none';
+              simulationPhase.style.display = 'block';
+              simulationPhase.classList.remove('hidden');
+              gsap.from(simulationPhase, {
+                opacity: 0,
+                duration: 0.4,
+                ease: "power2.out"
+              });
+              startSimulationUI();
+            }
+          });
         });
       } else {
         showSimulationPhase();
@@ -2244,8 +2973,11 @@
       const text = answerInput.value.trim();
       if (!text || isThinking) return;
 
+      sendButton.classList.add('sending');
+      celebrateSend();
       addMessage('user', text);
       answerInput.value = '';
+      updateAnswerMeter();
       autoResizeInput();
       isThinking = true;
       answerInput.disabled = true;
@@ -2266,6 +2998,7 @@
         isThinking = false;
         answerInput.disabled = false;
         sendButton.disabled = false;
+        sendButton.classList.remove('sending');
         answerInput.focus();
       }, 1100);
     }
@@ -2273,6 +3006,10 @@
     function autoResizeInput() {
       answerInput.style.height = 'auto';
       answerInput.style.height = Math.min(answerInput.scrollHeight, 112) + 'px';
+      updateAnswerMeter();
+      answerInput.classList.remove('typing-pulse');
+      void answerInput.offsetWidth;
+      answerInput.classList.add('typing-pulse');
     }
 
     function requestEndSimulation() {
@@ -2349,6 +3086,19 @@
       gsap.from('.sim-navbar, .info-bar', { opacity: 0, y: -8, duration: .35, stagger: .06, ease: 'power2.out', paused: true });
     }
 
+    function updateStartState() {
+      const count = selectedBandi.length;
+      if (selectedBandiCount) selectedBandiCount.textContent = count === 1 ? '1 selezionato' : count + ' selezionati';
+      startButton.disabled = count === 0;
+      startButton.classList.toggle('ready', count > 0);
+      if (startLabel) startLabel.textContent = count === 0 ? 'Seleziona un bando per iniziare' : 'Inizia Simulazione';
+      if (startHelper) startHelper.textContent = count === 0 ? 'Appena scegli almeno un bando, la simulazione si sblocca.' : 'Pronto: useremo ' + (count === 1 ? 'questo bando' : count + ' bandi') + ' come base della simulazione.';
+
+      if (window.gsap && count > 0) {
+        gsap.fromTo(startButton, { scale: 0.985 }, { scale: 1, duration: 0.28, ease: 'back.out(2)' });
+      }
+    }
+
     function initEvents() {
       bandoList.addEventListener('click', (event) => {
         const card = event.target.closest('[data-bando-id]');
@@ -2359,7 +3109,13 @@
         const exists = selectedBandi.some(item => String(item.id) === String(id));
         selectedBandi = exists ? selectedBandi.filter(item => String(item.id) !== String(id)) : [...selectedBandi, bando];
         card.classList.toggle('active', !exists);
-        startButton.disabled = selectedBandi.length === 0;
+        if (!exists && window.gsap) {
+          const spark = document.createElement('span');
+          spark.className = 'selection-spark';
+          card.appendChild(spark);
+          gsap.fromTo(spark, { scale: 0.4, opacity: 0.9, boxShadow: '0 0 0 0 rgba(37,99,235,.30)' }, { scale: 1.8, opacity: 0, boxShadow: '0 0 0 18px rgba(37,99,235,0)', duration: 0.45, ease: 'power2.out', onComplete: () => spark.remove() });
+        }
+        updateStartState();
       });
 
       difficultyCards.forEach(card => {
@@ -2391,6 +3147,10 @@
       confirmEndButton.addEventListener('click', endSimulation);
       sendButton.addEventListener('click', sendAnswer);
       feedbackToggle.addEventListener('click', () => feedbackPanel.classList.toggle('open'));
+      scrollBottomButton.addEventListener('click', () => chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' }));
+      chatArea.addEventListener('scroll', updateScrollButton, { passive: true });
+      answerInput.addEventListener('focus', () => document.querySelector('.input-shell').classList.add('composer-active'));
+      answerInput.addEventListener('blur', () => document.querySelector('.input-shell').classList.remove('composer-active'));
 
       answerInput.addEventListener('input', autoResizeInput);
       answerInput.addEventListener('keydown', (event) => {
